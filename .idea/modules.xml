@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/StenoKeyboard/StenoKeyboard.iml" filepath="$PROJECT_DIR$/StenoKeyboard/StenoKeyboard.iml" />
+      <module fileurl="file://$PROJECT_DIR$/StenoKeyboardProject.iml" filepath="$PROJECT_DIR$/StenoKeyboardProject.iml" />
+    </modules>
+  </component>
+</project>
+
