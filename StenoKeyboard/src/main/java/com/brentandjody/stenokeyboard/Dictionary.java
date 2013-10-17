@@ -10,7 +10,7 @@ import java.io.IOException;
 
 public class Dictionary {
 
-    private static final String DICTFILE = "dictionary/dict.json";
+    private static final String DICTFILE = "./dictionary/dict.json";
     private static TST<String> definitions;
 
     public Dictionary() {
