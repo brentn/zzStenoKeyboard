@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">StenoKeyboard</string>
+    <string name="steno_keyboard_label">Steno Keyboard</string>
+    <string name="steno_keyboard_settings">Steno Keyboard Settings</string>
 </resources>

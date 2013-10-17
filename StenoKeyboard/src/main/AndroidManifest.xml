@@ -10,6 +10,23 @@
         android:icon="@drawable/ic_launcher"
         android:theme="@style/AppTheme">
 
+        <!-- Declares the input method service -->
+        <service android:name="StenoKeyboard"
+            android:label="@string/steno_keyboard_label"
+            android:permission="android.permission.BIND_INPUT_METHOD">
+            <intent-filter>
+                <action android:name="android.view.InputMethod" />
+            </intent-filter>
+        </service>
+
+        <!-- user settings. -->
+        <activity android:name=".SettingsActivity" android:label="@string/steno_keyboard_settings">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+            </intent-filter>
+        </activity>
+
+
     </application>
 
 </manifest>
