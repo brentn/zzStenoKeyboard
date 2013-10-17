@@ -38,4 +38,8 @@ public class Dictionary {
             System.err.println("Dictionary File: "+filename+" could not be found");
         }
     }
+
+    public boolean isLoaded() {
+        return (definitions.size() > 0);
+    }
 }
