@@ -52,6 +52,9 @@ public class Dictionary {
     }
 
     public String lookup(String stroke) {
-        return "";
+    //basic lookup, no cacheing
+    //return null if not found
+    //return empty string if ambiguous
+        return definitions.get(stroke);
     }
 }
