@@ -6,6 +6,12 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * Created by brent on 16/10/13.
@@ -14,17 +20,17 @@ import java.io.InputStreamReader;
 public class Dictionary {
 
     private static final String DICTFILE = "dict.json";
-    private static TST<String> definitions;
+    private static TST<String> definitions = new TST<String>();
+    private Queue<String> strokeQ = new LinkedBlockingQueue<String>();
 
     public Dictionary() {
-        definitions = new TST<String>();
-        load(DICTFILE);
+        if (! isLoaded()) load(DICTFILE);
     }
 
     public void load(String filename) {
         String line, stroke, translation;
         String[] fields;
-        if (filename == null || filename.equals(""))
+        if (filename == null || filename.isEmpty())
             throw new IllegalArgumentException("Dictionary filename not provided");
         try {
             AssetManager am = SKApplication.getAppContext().getAssets();
@@ -52,9 +58,44 @@ public class Dictionary {
     }
 
     public String lookup(String stroke) {
-    //basic lookup, no cacheing
-    //return null if not found
-    //return empty string if ambiguous
+    // basic lookup, no cacheing
+    // return null if not found
+    // return empty string if ambiguous
+        if (((Collection) definitions.prefixMatch(stroke)).size() > 1) return "";
         return definitions.get(stroke);
+    }
+
+    public String translate(String stroke) {
+        // lookup and disambiguate multiple strokes (using cache)
+        // interpret special keystrokes
+        String result = "";
+        if (stroke.contains("/")) {
+            for (String partialStroke : stroke.split("/")) {
+                result += translate(partialStroke);
+            }
+            return result;
+        }
+        strokeQ.add(stroke);
+        String newStroke = "";
+        List<String> backup = new ArrayList<String>();
+        while (result.isEmpty() && strokeQ.size() > 0) {
+            newStroke += "/" + strokeQ.peek();
+            backup.add(strokeQ.remove());
+            result = lookup(newStroke.substring(1));
+            if (result == null) {
+                result = newStroke.substring(1).replace("/"," ");
+            } else if (result.isEmpty()) {
+                result = definitions.get(newStroke.substring(1));
+                if (result == null) result = "";
+            }
+        }
+        if (result.isEmpty()) { //deterministic result not found
+            for (String backupStroke : backup) {
+                strokeQ.add(backupStroke);
+            }
+        } else {
+            result += " ";
+        }
+        return result;
     }
 }
