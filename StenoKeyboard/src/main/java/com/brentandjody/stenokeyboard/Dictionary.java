@@ -1,8 +1,11 @@
 package com.brentandjody.stenokeyboard;
 
+import android.content.res.AssetManager;
+
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 /**
  * Created by brent on 16/10/13.
@@ -10,7 +13,7 @@ import java.io.IOException;
 
 public class Dictionary {
 
-    private static final String DICTFILE = "./dictionary/dict.json";
+    private static final String DICTFILE = "dict.json";
     private static TST<String> definitions;
 
     public Dictionary() {
@@ -21,11 +24,14 @@ public class Dictionary {
     public void load(String filename) {
         String line, stroke, translation;
         String[] fields;
-        if (filename == null || filename == "")
+        if (filename == null || filename.equals(""))
             throw new IllegalArgumentException("Dictionary filename not provided");
         try {
-            BufferedReader file = new BufferedReader(new FileReader(filename));
-            while ((line = file.readLine()) != null) {
+            AssetManager am = SKApplication.getAppContext().getAssets();
+            InputStream filestream = am.open(filename);
+            InputStreamReader reader = new InputStreamReader(filestream);
+            BufferedReader lines = new BufferedReader(reader);
+            while ((line = lines.readLine()) != null) {
                 fields = line.split("\"");
                 if ((fields.length >= 3) && (fields[3].length() > 0)) {
                     stroke = fields[1];
@@ -33,7 +39,9 @@ public class Dictionary {
                     definitions.put(stroke, translation);
                 }
             }
-            file.close();
+            lines.close();
+            reader.close();
+            filestream.close();
         } catch (IOException e) {
             System.err.println("Dictionary File: "+filename+" could not be found");
         }
@@ -41,5 +49,9 @@ public class Dictionary {
 
     public boolean isLoaded() {
         return (definitions.size() > 0);
+    }
+
+    public String lookup(String stroke) {
+        return "";
     }
 }
