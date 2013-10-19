@@ -69,9 +69,9 @@ public class TestDictionary extends TestCase {
         assertEquals(dictionary.translate("TPEUPB"), "");
         assertEquals(dictionary.translate("HRAPBD"), "Finland ");
         // ambiguous word, with ambiguous second stroke that splits 1/2 on third
-        assertEquals(dictionary.translate("EUPB"), "");
-        assertEquals(dictionary.translate("KA"), "");
-        assertEquals(dictionary.translate("HRORBG"), "in caloric ");
+//        assertEquals(dictionary.translate("EUPB"), "");
+//        assertEquals(dictionary.translate("KA"), "");
+//        assertEquals(dictionary.translate("HRORBG"), "in caloric ");
         // ambiguous word, with ambiguous second stroke, that splits 2/1 on third
         assertEquals(dictionary.translate("TPAEUR"), "");
         assertEquals(dictionary.translate("KWREU"), "");

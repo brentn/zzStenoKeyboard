@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -68,33 +69,56 @@ public class Dictionary {
     public String translate(String stroke) {
         // lookup and disambiguate multiple strokes (using cache)
         // interpret special keystrokes
+
+        String translation;
         String result = "";
+        // handle multi-stroke input recursively
         if (stroke.contains("/")) {
-            for (String partialStroke : stroke.split("/")) {
-                result += translate(partialStroke);
+            for (String subStroke : stroke.split("/")) {
+                result += translate(subStroke);
             }
             return result;
         }
-        strokeQ.add(stroke);
-        String newStroke = "";
-        List<String> backup = new ArrayList<String>();
-        while (result.isEmpty() && strokeQ.size() > 0) {
-            newStroke += "/" + strokeQ.peek();
-            backup.add(strokeQ.remove());
-            result = lookup(newStroke.substring(1));
-            if (result == null) {
-                result = newStroke.substring(1).replace("/"," ");
-            } else if (result.isEmpty()) {
-                result = definitions.get(newStroke.substring(1));
-                if (result == null) result = "";
+
+
+        if (strokeQ.isEmpty()) { // if there is no queue, it's easy
+            translation = lookup(stroke);
+            if (translation == null) return stroke + " ";
+            if (translation.isEmpty()) { // ambiguous
+                strokeQ.add(stroke);
+                return "";
             }
+            // deterministic
+            return translation + " ";
+
+        } else { // there is a queue to deal with
+            String qString = strokesInQueue();
+            translation = (lookup(qString+"/"+stroke));
+            if (translation == null) {
+                // the full stroke was not found, so let's break it up
+                strokeQ.clear();
+                translation = definitions.get(qString);
+                if (translation == null) {
+                    translation = qString.replace("/"," ");
+                }
+                return translation + " " + translate(stroke);
+            }
+            if (translation.isEmpty()) { // ambiguous
+                strokeQ.add(stroke);
+                return "";
+            }
+            // deterministic
+            strokeQ.clear();
+            return translation + " ";
         }
-        if (result.isEmpty()) { //deterministic result not found
-            for (String backupStroke : backup) {
-                strokeQ.add(backupStroke);
-            }
-        } else {
-            result += " ";
+    }
+
+    private String strokesInQueue() {
+        if (strokeQ.isEmpty()) return "";
+        Iterator<String> it = strokeQ.iterator();
+        String result = it.next();
+        while (it.hasNext()) {
+            result += "/" + it.next();
         }
         return result;
     }
