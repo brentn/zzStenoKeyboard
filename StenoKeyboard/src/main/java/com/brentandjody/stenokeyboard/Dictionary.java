@@ -6,19 +6,18 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Queue;
-import java.util.concurrent.DelayQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * Created by brent on 16/10/13.
+ * Lookup words/phrases in steno dictionary
+ * Add spacing
+ * Decode several "special characters"
  */
 
 public class Dictionary {
@@ -81,16 +80,11 @@ public class Dictionary {
         if (stroke.contains("/")) {
             for (String subStroke : stroke.split("/")) {
                 translation = translate(subStroke);
-                if (translation.contains("\b")) {
-                    int x = result.length() - translation.length();
-                    if (x > 0) {
-                        result = result.substring(0, x);
-                    } else {
-                        result = "";
-                    }
-                } else {
-                    result += translation;
+                while ((translation.length()>0) && (translation.charAt(0) == '\b')) {
+                    translation = translation.substring(1);
+                    result = result.substring(0,result.length()-1);
                 }
+                result += translation;
             }
             return result;
         }
@@ -118,7 +112,7 @@ public class Dictionary {
             }
             // deterministic
             updateHistory(stroke, translation);
-            return translation + " ";
+            return decode(translation);
 
         } else { // there is a queue to deal with
             String qString = strokesInQueue();
@@ -130,7 +124,7 @@ public class Dictionary {
                     translation = qString.replace("/"," ");
                 }
                 updateHistory(strokeQ, translation);
-                return translation + " " + translate(stroke);
+                return decode(translation) + translate(stroke);
             }
             if (translation.isEmpty()) { // ambiguous
                 strokeQ.add(stroke);
@@ -139,7 +133,7 @@ public class Dictionary {
             // deterministic
             strokeQ.add(stroke);
             updateHistory(strokeQ, translation);
-            return translation + " ";
+            return decode(translation);
         }
     }
 
@@ -153,11 +147,29 @@ public class Dictionary {
         return result;
     }
 
+    private String decode(String input) {
+        // short circuit if no special characters
+        if (! input.contains("{")) return input+" ";
+        //handle glue
+        String output = input + " ";
+        // start glue
+        if (input.substring(0,2).equals("{^")) {
+            output = "\b" + output.replace("{^","");
+        }
+        // end glue
+        int pos = input.indexOf("^}");
+        if (pos >= 0) {
+            output = output.replace("^}","");
+            output = output.substring(0, output.length()-1);
+        }
+        return output.replace("{","").replace("}","");
+    }
+
     private void updateHistory(Object stroke, String translation) {
         if (stroke instanceof String) {
             strokeHistory.push((String) stroke);
-        } else {
-            if (stroke instanceof Deque)
+        }
+        if (stroke instanceof Deque) {
             for (String s : (Deque<String>) stroke) {
                 strokeHistory.push(s);
             }

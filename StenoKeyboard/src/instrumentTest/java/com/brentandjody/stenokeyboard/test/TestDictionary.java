@@ -4,9 +4,7 @@ import com.brentandjody.stenokeyboard.Dictionary;
 
 import junit.framework.TestCase;
 
-/**
- * Created by brent on 17/10/13.
- */
+
 public class TestDictionary extends TestCase {
     protected Dictionary dictionary;
 
@@ -100,6 +98,16 @@ public class TestDictionary extends TestCase {
         assertEquals(dictionary.translate("TPEUPB/HRAPBD/*/EURB/-G"), "finishing ");
         // undo three of four strokes
         assertEquals(dictionary.translate("RAODZ/RAODZ/RAODZ/RAODZ/*/*/*"), "roads ");
+    }
+
+
+    public void testGlue() {
+        // start glue
+        assertEquals(dictionary.translate("*ERLT/ES/S-LS"), "earthes is also ");
+        // end glue
+        assertEquals(dictionary.translate("*ERBGS/A/KROS"), "extraacross ");
+        // both glue
+        assertEquals(dictionary.translate("TOGT/TK-LS/TOGT"), "togethertogether ");
     }
 
 }
