@@ -137,6 +137,7 @@ public class Dictionary {
                 return "";
             }
             // deterministic
+            strokeQ.add(stroke);
             updateHistory(strokeQ, translation);
             return translation + " ";
         }
@@ -209,7 +210,7 @@ public class Dictionary {
         if (! strokeHistory.isEmpty()) {
             stroke = strokeHistory.pop();
             while ((! strokeHistory.isEmpty()) && (! translation.equals(stroke)) && (! translation.equals(definitions.get(stroke)))) {
-                stroke += "/" + strokeHistory.pop();
+                stroke =  strokeHistory.pop() + "/" + stroke;
             }
         }
         Queue<String> result = new LinkedBlockingQueue<String>();

@@ -97,7 +97,7 @@ public class TestDictionary extends TestCase {
         // fix an invald misstroke
         assertEquals(dictionary.translate("TPEUPB/-BLS/*/HRAPBD"), "Finland ");
         // fix a valid but wrong second stroke
-        assertEquals(dictionary.translate("TPEUPB/HRAPBD/*/EURB"), "finish ");
+        assertEquals(dictionary.translate("TPEUPB/HRAPBD/*/EURB/-G"), "finishing ");
         // undo three of four strokes
         assertEquals(dictionary.translate("RAODZ/RAODZ/RAODZ/RAODZ/*/*/*"), "roads ");
     }
