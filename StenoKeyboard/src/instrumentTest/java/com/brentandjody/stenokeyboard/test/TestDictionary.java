@@ -78,6 +78,30 @@ public class TestDictionary extends TestCase {
         assertEquals(dictionary.translate("TAEULS"), "fairy tails ");
     }
 
+    public void testUndo() {
+        // undo with no prior stroke
+        assertEquals(dictionary.translate("*"), "");
+        // undo with illegal stroke
+        assertEquals(dictionary.translate("-TSDZ/*"), "");
+        // undo with valid stroke
+        assertEquals(dictionary.translate("RAODZ/*"), "");
+        assertEquals(dictionary.translate("RAODZ"), "roads ");
+        assertEquals(dictionary.translate("*"), "\b\b\b\b\b\b");
+        // undo one of two strokes
+        assertEquals(dictionary.translate("RAODZ/TOGT/*"), "roads ");
+        // ensure correct number of backspaces are sent for multiple words
+        assertEquals(dictionary.translate("RAODZ"), "roads ");
+        assertEquals(dictionary.translate("TOGT"), "together ");
+        assertEquals(dictionary.translate("*"), "\b\b\b\b\b\b\b\b\b");
+        assertEquals(dictionary.translate("*"), "\b\b\b\b\b\b");
+        // fix an invald misstroke
+        assertEquals(dictionary.translate("TPEUPB/-BLS/*/HRAPBD"), "Finland ");
+        // fix a valid but wrong second stroke
+        assertEquals(dictionary.translate("TPEUPB/HRAPBD/*/EURB"), "finish ");
+        // undo three of four strokes
+        assertEquals(dictionary.translate("RAODZ/RAODZ/RAODZ/RAODZ/*/*/*"), "roads ");
+    }
+
 }
 
 
