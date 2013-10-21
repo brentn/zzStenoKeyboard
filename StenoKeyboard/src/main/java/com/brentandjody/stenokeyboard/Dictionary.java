@@ -6,9 +6,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -25,6 +27,7 @@ public class Dictionary {
     private static final String DICTFILE = "dict.json";
     private static TST<String> definitions = new TST<String>();
     private Deque<String> strokeQ = new LinkedBlockingDeque<String>();
+    private List<Definition> candidates = new ArrayList<Definition>();
     private History history = new History();
     private History strokeHistory = new History();
 
@@ -134,6 +137,14 @@ public class Dictionary {
             strokeQ.add(stroke);
             updateHistory(strokeQ, translation);
             return decode(translation);
+        }
+    }
+
+    private void getCandidates(String stroke) {
+        candidates.clear();
+        for (translation : definitions.prefixMatch(stroke)) {
+            Definition definition = new Definition(stroke, translation);
+            candidates.add(definition);
         }
     }
 
@@ -257,6 +268,27 @@ public class Dictionary {
                 return stack.removeFirst();
             }
             return null;
+        }
+    }
+
+    class Definition {
+        private String mStroke;
+        private String mTranslation;
+        public Definition(String stroke, String translation) {
+            set(stroke, translation);
+        }
+
+        public void set(String stroke, String translation) {
+            mStroke = stroke;
+            mTranslation = translation;
+        }
+
+        public String getStroke() {
+            return mStroke;
+        }
+
+        public String getTranslation() {
+            return mTranslation;
         }
     }
 }
