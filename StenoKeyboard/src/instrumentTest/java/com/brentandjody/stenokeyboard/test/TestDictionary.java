@@ -4,6 +4,8 @@ import com.brentandjody.stenokeyboard.Dictionary;
 
 import junit.framework.TestCase;
 
+import java.util.List;
+
 
 public class TestDictionary extends TestCase {
     protected Dictionary dictionary;
@@ -108,6 +110,14 @@ public class TestDictionary extends TestCase {
         assertEquals(dictionary.translate("*ERBGS/A/KROS"), "extraacross ");
         // both glue
         assertEquals(dictionary.translate("TOGT/TK-LS/TOGT"), "togethertogether ");
+    }
+
+    public void testCandidates() {
+        dictionary.lookup("A/ABT");
+        List<String> candidates = dictionary.getCandidateStrings();
+        assertEquals(candidates.size(), 2);
+        assertTrue(candidates.contains("attribute"));
+        assertTrue(candidates.contains("attributing"));
     }
 
 }

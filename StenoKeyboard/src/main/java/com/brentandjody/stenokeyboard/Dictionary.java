@@ -69,7 +69,11 @@ public class Dictionary {
     // basic lookup, no cacheing
     // return null if not found
     // return empty string if ambiguous
-        if (((Collection) definitions.prefixMatch(stroke)).size() > 1) return "";
+        candidates.clear();
+        if (((Collection) definitions.prefixMatch(stroke)).size() > 1) {
+            generateCandidates(stroke);
+            return "";
+        }
         return definitions.get(stroke);
     }
 
@@ -140,11 +144,19 @@ public class Dictionary {
         }
     }
 
-    private void getCandidates(String stroke) {
+    public List<String> getCandidateStrings() {
+        List<String> result = new ArrayList<String>();
+        for (Definition candidate : candidates) {
+            result.add(candidate.getTranslation());
+        }
+        return result;
+    }
+
+    private void generateCandidates(String stroke) {
         candidates.clear();
-        for (translation : definitions.prefixMatch(stroke)) {
-            Definition definition = new Definition(stroke, translation);
-            candidates.add(definition);
+        for (String candidateStroke : definitions.prefixMatch(stroke)) {
+            Definition candidate = new Definition(candidateStroke, definitions.get(candidateStroke));
+            candidates.add(candidate);
         }
     }
 
