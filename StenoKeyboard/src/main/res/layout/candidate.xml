@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:minWidth="50dp"
+    android:textSize="9pt"
+    android:gravity="center"
+    android:paddingLeft="10dp"
+    android:paddingTop="0dp"
+    android:paddingRight="10dp"
+    android:paddingBottom="0dp"
+    android:hapticFeedbackEnabled="false"
+    android:focusable="false"
+    android:clickable="false"
+    android:singleLine="true"
+    android:textColor="@android:color/holo_orange_light"
+    android:ellipsize="none" />

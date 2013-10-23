@@ -1,0 +1,434 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<com.brentandjody.stenokeyboard.TouchLayer xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="300dp"
+    tools:context=".MainActivity"
+    android:orientation="vertical"
+    android:id="@+id/keyboard"
+    android:measureWithLargestChild="false">
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:clickable="false"
+        android:layout_marginBottom="2dp">
+
+        <Button
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="#"
+            android:id="@+id/number_bar"
+            android:background="@drawable/numberbar"
+            android:minHeight="10dp"
+            android:clickable="false"
+            android:maxHeight="20dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="fill_parent"
+            android:layout_height="match_parent"
+            android:minHeight="100dp"
+            android:layout_weight="1">
+
+            <Button
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:id="@+id/S"
+                android:layout_centerInParent="true"
+                android:background="@drawable/roundedkey"
+                android:cropToPadding="true"
+                android:padding="10dp"
+                android:paddingLeft="20dip"
+                android:paddingRight="30dip"
+                android:layout_marginRight="2dp"
+                android:layout_marginLeft="2dp"
+                android:clickable="false"
+                android:text="S" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:minHeight="100dp"
+            android:id="@+id/linearLayout"
+            android:layout_weight="1">
+
+            <Button
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:id="@+id/T"
+                android:layout_centerInParent="true"
+                android:background="@drawable/squarekey"
+                android:layout_marginLeft="2dp"
+                android:layout_marginRight="2dp"
+                android:clickable="false"
+                android:layout_marginBottom="2dp"
+                android:text="T"
+                android:layout_weight="1" />
+
+            <Button
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:id="@+id/K"
+                android:layout_centerInParent="true"
+                android:background="@drawable/roundedkey"
+                android:layout_marginRight="2dp"
+                android:layout_marginLeft="2dp"
+                android:clickable="false"
+                android:text="K"
+                android:layout_weight="1" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:minHeight="100dp"
+            android:id="@+id/linearLayout2"
+            android:layout_weight="1" >
+
+            <Button
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:id="@+id/P"
+                android:layout_centerInParent="true"
+                android:background="@drawable/squarekey"
+                android:layout_marginLeft="2dp"
+                android:layout_marginRight="2dp"
+                android:clickable="false"
+                android:layout_marginBottom="2dp"
+                android:layout_weight="1"
+                android:text="P" />
+
+            <Button
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:id="@+id/W"
+                android:layout_centerInParent="true"
+                android:background="@drawable/roundedkey"
+                android:layout_marginRight="2dp"
+                android:layout_marginLeft="2dp"
+                android:clickable="false"
+                android:text="W"
+                android:layout_weight="1" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:minHeight="100dp"
+            android:id="@+id/linearLayout3"
+            android:layout_weight="1" >
+
+            <Button
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:id="@+id/H"
+                android:layout_centerInParent="true"
+                android:background="@drawable/squarekey"
+                android:layout_marginLeft="2dp"
+                android:layout_marginRight="2dp"
+                android:clickable="false"
+                android:layout_marginBottom="2dp"
+                android:layout_weight="1"
+                android:text="H" />
+
+            <Button
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:id="@+id/R"
+                android:layout_centerInParent="true"
+                android:background="@drawable/roundedkey"
+                android:layout_marginRight="2dp"
+                android:layout_marginLeft="2dp"
+                android:clickable="false"
+                android:text="R"
+                android:layout_weight="1" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="fill_parent"
+            android:layout_height="match_parent"
+            android:minHeight="100dp"
+            android:layout_weight=".92"
+            android:id="@+id/linearLayout4">
+
+            <Button
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:id="@+id/star"
+                android:layout_centerInParent="true"
+                android:background="@drawable/roundedkey"
+                android:layout_marginLeft="4dp"
+                android:layout_marginRight="4dp"
+                android:clickable="false"
+                android:text="*" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:minHeight="100dp"
+            android:id="@+id/linearLayout5"
+            android:layout_weight="1" >
+
+            <Button
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:id="@+id/_F"
+                android:layout_centerInParent="true"
+                android:background="@drawable/squarekey"
+                android:layout_marginRight="2dp"
+                android:layout_marginLeft="2dp"
+                android:clickable="false"
+                android:layout_marginBottom="2dp"
+                android:layout_weight="1"
+                android:text="F" />
+
+            <Button
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:id="@+id/_R"
+                android:layout_centerInParent="true"
+                android:background="@drawable/roundedkey"
+                android:layout_marginLeft="2dp"
+                android:layout_marginRight="2dp"
+                android:clickable="false"
+                android:text="R"
+                android:layout_weight="1" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:minHeight="100dp"
+            android:id="@+id/linearLayout6"
+            android:layout_weight="1" >
+
+            <Button
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:id="@+id/_P"
+                android:layout_centerInParent="true"
+                android:background="@drawable/squarekey"
+                android:layout_marginLeft="2dp"
+                android:layout_marginRight="2dp"
+                android:clickable="false"
+                android:layout_marginBottom="2dp"
+                android:layout_weight="1"
+                android:text="P" />
+
+            <Button
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:id="@+id/_B"
+                android:layout_centerInParent="true"
+                android:background="@drawable/roundedkey"
+                android:layout_marginRight="2dp"
+                android:layout_marginLeft="2dp"
+                android:clickable="false"
+                android:text="B"
+                android:layout_weight="1" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:minHeight="100dp"
+            android:id="@+id/linearLayout7"
+            android:layout_weight="1" >
+
+            <Button
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:id="@+id/_L"
+                android:layout_centerInParent="true"
+                android:background="@drawable/squarekey"
+                android:layout_marginRight="2dp"
+                android:layout_marginLeft="2dp"
+                android:clickable="false"
+                android:layout_marginBottom="2dp"
+                android:layout_weight="1"
+                android:text="L" />
+
+            <Button
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:id="@+id/_G"
+                android:layout_centerInParent="true"
+                android:background="@drawable/roundedkey"
+                android:layout_marginLeft="2dp"
+                android:layout_marginRight="2dp"
+                android:clickable="false"
+                android:text="G"
+                android:layout_weight="1" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:minHeight="100dp"
+            android:layout_weight="1"
+            android:id="@+id/linearLayout8" >
+
+            <Button
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:id="@+id/_T"
+                android:layout_centerInParent="true"
+                android:background="@drawable/squarekey"
+                android:layout_marginLeft="2dp"
+                android:layout_marginRight="2dp"
+                android:clickable="false"
+                android:layout_marginBottom="2dp"
+                android:layout_weight="1"
+                android:text="T" />
+
+            <Button
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:id="@+id/_S"
+                android:layout_centerInParent="true"
+                android:background="@drawable/roundedkey"
+                android:layout_marginRight="2dp"
+                android:layout_marginLeft="2dp"
+                android:clickable="false"
+                android:text="S"
+                android:layout_weight="1" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:minHeight="100dp"
+            android:layout_weight="1"
+            android:id="@+id/linearLayout9" >
+
+            <Button
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:id="@+id/_D"
+                android:layout_centerInParent="true"
+                android:background="@drawable/squarekey"
+                android:layout_marginLeft="2dp"
+                android:layout_marginRight="2dp"
+                android:clickable="false"
+                android:layout_marginBottom="2dp"
+                android:layout_weight="1"
+                android:text="D" />
+
+            <Button
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:id="@+id/_Z"
+                android:layout_centerInParent="true"
+                android:background="@drawable/roundedkey"
+                android:layout_marginRight="2dp"
+                android:layout_marginLeft="2dp"
+                android:clickable="false"
+                android:layout_weight="1"
+                android:text="Z" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="horizontal"
+        android:layout_marginTop="2dp"
+        android:layout_weight="2">
+
+        <Button
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="..."
+            android:id="@+id/button2"
+            android:layout_weight=".98"
+            android:layout_marginRight="10dp" />
+
+
+        <Button
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_weight="1"
+            android:text = "A"
+            android:id="@+id/A"
+            android:layout_centerInParent="true"
+            android:background="@drawable/roundedkey"
+            android:clickable="false" />
+
+
+        <Button
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_weight="1"
+            android:text="O"
+            android:id="@+id/O"
+            android:layout_centerInParent="true"
+            android:background="@drawable/roundedkey"
+            android:clickable="false" />
+
+        <FrameLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:id="@+id/frameLayout"
+            android:layout_weight="1" />
+
+        <Button
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_weight="1"
+            android:text="E"
+            android:id="@+id/_E"
+            android:layout_centerInParent="true"
+            android:background="@drawable/roundedkey"
+            android:clickable="false" />
+
+        <Button
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_weight="1"
+            android:text="U"
+            android:id="@+id/_U"
+            android:layout_centerInParent="true"
+            android:background="@drawable/roundedkey"
+            android:clickable="false" />
+
+        <Button
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Send"
+            android:id="@+id/send_button"
+            android:layout_weight=".86"
+            android:layout_marginLeft="10dp" />
+
+    </LinearLayout>
+
+</com.brentandjody.stenokeyboard.TouchLayer>
