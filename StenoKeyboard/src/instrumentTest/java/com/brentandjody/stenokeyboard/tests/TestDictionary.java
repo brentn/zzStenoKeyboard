@@ -1,4 +1,4 @@
-package com.brentandjody.stenokeyboard.test;
+package com.brentandjody.stenokeyboard.tests;
 
 import com.brentandjody.stenokeyboard.Dictionary;
 
@@ -27,19 +27,19 @@ public class TestDictionary extends TestCase {
 
     public void testLookup() {
         //word not in dictionary
-        assertNull (dictionary.lookup("-TSDZ"));
+        assertNull(dictionary.lookup("-TSDZ"));
         //single deterministic words
-        assertEquals(dictionary.lookup("HR-GT"),"altogether");
-        assertEquals(dictionary.lookup("TPHROUPBS"),"flounce");
+        assertEquals(dictionary.lookup("HR-GT"), "altogether");
+        assertEquals(dictionary.lookup("TPHROUPBS"), "flounce");
         //single ambiguous words
-        assertEquals(dictionary.lookup("PRAOE"),"");
-        assertEquals(dictionary.lookup("TPAUR") ,"");
+        assertEquals(dictionary.lookup("PRAOE"), "");
+        assertEquals(dictionary.lookup("TPAUR"), "");
         //multi-stroke words
-        assertEquals(dictionary.lookup("HR-G/HREU"),"willingly");
-        assertEquals(dictionary.lookup("RE/SAOEF"),"receive");
+        assertEquals(dictionary.lookup("HR-G/HREU"), "willingly");
+        assertEquals(dictionary.lookup("RE/SAOEF"), "receive");
         assertEquals(dictionary.lookup("A*UT/EPBT/EUBG"), "authentic");
         //stroke-by-stroke, should not combine
-        assertEquals(dictionary.lookup("A*UT"),"");
+        assertEquals(dictionary.lookup("A*UT"), "");
         assertEquals(dictionary.lookup("EPBT"), "");
         assertEquals(dictionary.lookup("EUBG"), "");
     }
@@ -110,6 +110,12 @@ public class TestDictionary extends TestCase {
         assertEquals(dictionary.translate("*ERBGS/A/KROS"), "extraacross ");
         // both glue
         assertEquals(dictionary.translate("TOGT/TK-LS/TOGT"), "togethertogether ");
+    }
+
+    public void testCapitalize() {
+        assertEquals(dictionary.translate("KPA*/TOEPBS"), "\bTones ");
+        assertEquals(dictionary.translate("KPA")," ");
+        assertEquals(dictionary.translate("TOEPBS"), " Tones ");
     }
 
     public void testCandidates() {

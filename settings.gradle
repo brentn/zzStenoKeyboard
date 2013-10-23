@@ -1,1 +1,1 @@
-include ':StenoKeyboard', ':StenoKeyboardTests', ':InstrumentTest'
+include ':StenoKeyboard', ':StenoKeyboardTests', ':InstrumentTest', ':Tests', ':Tests'

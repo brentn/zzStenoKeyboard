@@ -5,6 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/StenoKeyboard/StenoKeyboard.iml" filepath="$PROJECT_DIR$/StenoKeyboard/StenoKeyboard.iml" />
       <module fileurl="file://$PROJECT_DIR$/StenoKeyboardProject.iml" filepath="$PROJECT_DIR$/StenoKeyboardProject.iml" />
       <module fileurl="file://$PROJECT_DIR$/StenoKeyboardTests/StenoKeyboardTests.iml" filepath="$PROJECT_DIR$/StenoKeyboardTests/StenoKeyboardTests.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Tests/Tests.iml" filepath="$PROJECT_DIR$/Tests/Tests.iml" />
     </modules>
   </component>
 </project>

@@ -30,6 +30,7 @@ public class Dictionary {
     private List<Definition> candidates = new ArrayList<Definition>();
     private History history = new History();
     private History strokeHistory = new History();
+    private Boolean capitalizeNextWord = false;
 
     public Dictionary() {
         if (! isLoaded()) load(DICTFILE);
@@ -87,7 +88,7 @@ public class Dictionary {
         if (stroke.contains("/")) {
             for (String subStroke : stroke.split("/")) {
                 translation = translate(subStroke);
-                while ((translation.length()>0) && (translation.charAt(0) == '\b')) {
+                while ((result.length()>0) && (translation.length()>0) && (translation.charAt(0) == '\b')) {
                     translation = translation.substring(1);
                     result = result.substring(0,result.length()-1);
                 }
@@ -171,6 +172,10 @@ public class Dictionary {
     }
 
     private String decode(String input) {
+        if (capitalizeNextWord) {
+            input = input.substring(0,1).toUpperCase() + input.substring(1);
+        }
+        capitalizeNextWord = false;
         // short circuit if no special characters
         if (! input.contains("{")) return input+" ";
         //handle glue
@@ -185,7 +190,14 @@ public class Dictionary {
             output = output.replace("^}","");
             output = output.substring(0, output.length()-1);
         }
-        return output.replace("{","").replace("}","");
+        // capitalization
+        pos = input.indexOf("{-|}");
+        if (pos > 0) {
+            capitalizeNextWord = true;
+            output = output.replace("{-|} ","");
+        }
+        output = output.replace("{","").replace("}","");
+        return output;
     }
 
     private void updateHistory(Object stroke, String translation) {
