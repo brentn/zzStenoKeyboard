@@ -114,8 +114,8 @@ public class TestDictionary extends TestCase {
 
     public void testCapitalize() {
         assertEquals(dictionary.translate("KPA*/TOEPBS"), "\bTones ");
-        assertEquals(dictionary.translate("KPA")," ");
-        assertEquals(dictionary.translate("TOEPBS"), " Tones ");
+        assertEquals(dictionary.translate("KPA"),"");
+        assertEquals(dictionary.translate("TOEPBS"), "  Tones ");
     }
 
     public void testCandidates() {

@@ -194,7 +194,7 @@ public class Dictionary {
         pos = input.indexOf("{-|}");
         if (pos > 0) {
             capitalizeNextWord = true;
-            output = output.replace("{-|} ","");
+            output = output.replace("{-|}","");
         }
         output = output.replace("{","").replace("}","");
         return output;
