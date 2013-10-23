@@ -1,5 +1,6 @@
 package com.brentandjody.stenokeyboard;
 
+import android.content.Context;
 import android.content.res.AssetManager;
 
 import java.io.BufferedReader;
@@ -31,8 +32,10 @@ public class Dictionary {
     private History history = new History();
     private History strokeHistory = new History();
     private Boolean capitalizeNextWord = false;
+    private Context context;
 
-    public Dictionary() {
+    public Dictionary(Context c) {
+        context = c;
         if (! isLoaded()) load(DICTFILE);
     }
 
@@ -42,7 +45,7 @@ public class Dictionary {
         if (filename == null || filename.isEmpty())
             throw new IllegalArgumentException("Dictionary filename not provided");
         try {
-            AssetManager am = SKApplication.getAppContext().getAssets();
+            AssetManager am = context.getAssets();
             InputStream filestream = am.open(filename);
             InputStreamReader reader = new InputStreamReader(filestream);
             BufferedReader lines = new BufferedReader(reader);

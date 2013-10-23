@@ -1,5 +1,10 @@
 package com.brentandjody.stenokeyboard.tests;
 
+import android.content.Context;
+import android.test.AndroidTestCase;
+import android.test.AndroidTestRunner;
+import android.test.IsolatedContext;
+
 import com.brentandjody.stenokeyboard.Dictionary;
 
 import junit.framework.TestCase;
@@ -7,11 +12,11 @@ import junit.framework.TestCase;
 import java.util.List;
 
 
-public class TestDictionary extends TestCase {
+public class TestDictionary extends AndroidTestCase {
     protected Dictionary dictionary;
 
     protected void setUp() {
-        dictionary = new Dictionary();
+        dictionary = new Dictionary(getContext());
     }
 
     protected void tearDown() {
