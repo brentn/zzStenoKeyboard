@@ -136,7 +136,7 @@ public class TouchLayer extends LinearLayout {
                 result += "-";
             }
             if (key.isSelected()) {
-                if ("AOEU".contains(key.getText())) hasVowels = true;
+                if ("*AOEU".contains(key.getText())) hasVowels = true;
                 result += key.getText();
                 key.setSelected(false);
             }

@@ -7,6 +7,7 @@
     tools:context=".MainActivity"
     android:orientation="vertical"
     android:id="@+id/keyboard"
+    android:background="@android:color/darker_gray"
     android:measureWithLargestChild="false">
 
     <LinearLayout
@@ -427,7 +428,8 @@
             android:text="Send"
             android:id="@+id/send_button"
             android:layout_weight=".86"
-            android:layout_marginLeft="10dp" />
+            android:layout_marginLeft="10dp"
+            android:background="@android:color/white" />
 
     </LinearLayout>
 
