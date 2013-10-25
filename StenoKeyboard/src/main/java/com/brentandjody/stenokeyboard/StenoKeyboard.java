@@ -1,10 +1,13 @@
 package com.brentandjody.stenokeyboard;
 
+import android.app.ProgressDialog;
 import android.inputmethodservice.InputMethodService;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,7 +26,12 @@ public class StenoKeyboard extends InputMethodService {
     @Override
     public void onCreate() {
         super.onCreate();
+        ProgressDialog progress = new ProgressDialog(this);
+        progress.setTitle("Loading");
+        progress.setMessage("Loading Dictionary...");
+        progress.show();
         dictionary = new Dictionary(getApplicationContext());
+        progress.dismiss();
     }
 
 
@@ -56,8 +64,9 @@ public class StenoKeyboard extends InputMethodService {
     public View onCreateCandidatesView() {
         super.onCreateCandidatesView();
         LayoutInflater layoutInflater = getLayoutInflater();
-        candidatesView = (LinearLayout) layoutInflater.inflate(R.layout.candidates, null);
-        return candidatesView;
+        HorizontalScrollView scrollView = (HorizontalScrollView) layoutInflater.inflate(R.layout.candidates, null);
+        candidatesView = (LinearLayout) scrollView.findViewById(R.id.candidatesView);
+        return scrollView;
     }
 
     private void populateCandidates(List<String> items) {

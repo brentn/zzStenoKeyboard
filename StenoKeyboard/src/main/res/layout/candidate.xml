@@ -14,5 +14,5 @@
     android:focusable="false"
     android:clickable="false"
     android:singleLine="true"
-    android:textColor="@android:color/holo_orange_light"
+    android:textColor="@android:color/holo_blue_light"
     android:ellipsize="none" />

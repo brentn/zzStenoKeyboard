@@ -21,6 +21,7 @@ import java.util.List;
 public class TouchLayer extends LinearLayout {
 
     private static final int TOUCH_RADIUS = 25;
+    private static final int MIN_KBD_HEIGHT = 500;
     private List<Button> keys = new ArrayList<Button>();
     private Button fKey;
 
@@ -53,6 +54,8 @@ public class TouchLayer extends LinearLayout {
         Point size = new Point();
         display.getSize(size);
         int screen_height = size.y;
+        int keyboard_height = screen_height / 3;
+        if (keyboard_height < MIN_KBD_HEIGHT) keyboard_height = MIN_KBD_HEIGHT
         this.getLayoutParams().height = screen_height / 3;
     }
 
