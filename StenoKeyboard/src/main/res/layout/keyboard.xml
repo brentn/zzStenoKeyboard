@@ -37,7 +37,9 @@
             android:layout_width="fill_parent"
             android:layout_height="match_parent"
             android:minHeight="100dp"
-            android:layout_weight="1">
+            android:layout_weight="1"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp">
 
             <Button
                 android:layout_width="fill_parent"
@@ -62,7 +64,9 @@
             android:layout_height="fill_parent"
             android:minHeight="100dp"
             android:id="@+id/linearLayout"
-            android:layout_weight="1">
+            android:layout_weight="1"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp">
 
             <Button
                 android:layout_width="fill_parent"
@@ -97,7 +101,9 @@
             android:layout_height="fill_parent"
             android:minHeight="100dp"
             android:id="@+id/linearLayout2"
-            android:layout_weight="1" >
+            android:layout_weight="1"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp">
 
             <Button
                 android:layout_width="fill_parent"
@@ -132,7 +138,9 @@
             android:layout_height="fill_parent"
             android:minHeight="100dp"
             android:id="@+id/linearLayout3"
-            android:layout_weight="1" >
+            android:layout_weight="1"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp">
 
             <Button
                 android:layout_width="fill_parent"
@@ -166,8 +174,10 @@
             android:layout_width="fill_parent"
             android:layout_height="match_parent"
             android:minHeight="100dp"
-            android:layout_weight=".92"
-            android:id="@+id/linearLayout4">
+            android:layout_weight="1"
+            android:id="@+id/linearLayout4"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp">
 
             <Button
                 android:layout_width="fill_parent"
@@ -188,7 +198,9 @@
             android:layout_height="fill_parent"
             android:minHeight="100dp"
             android:id="@+id/linearLayout5"
-            android:layout_weight="1" >
+            android:layout_weight="1"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp">
 
             <Button
                 android:layout_width="fill_parent"
@@ -223,7 +235,9 @@
             android:layout_height="fill_parent"
             android:minHeight="100dp"
             android:id="@+id/linearLayout6"
-            android:layout_weight="1" >
+            android:layout_weight="1"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp">
 
             <Button
                 android:layout_width="fill_parent"
@@ -258,7 +272,9 @@
             android:layout_height="fill_parent"
             android:minHeight="100dp"
             android:id="@+id/linearLayout7"
-            android:layout_weight="1" >
+            android:layout_weight="1"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp">
 
             <Button
                 android:layout_width="fill_parent"
@@ -293,7 +309,9 @@
             android:layout_height="fill_parent"
             android:minHeight="100dp"
             android:layout_weight="1"
-            android:id="@+id/linearLayout8" >
+            android:id="@+id/linearLayout8"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp">
 
             <Button
                 android:layout_width="fill_parent"
@@ -328,7 +346,9 @@
             android:layout_height="fill_parent"
             android:minHeight="100dp"
             android:layout_weight="1"
-            android:id="@+id/linearLayout9" >
+            android:id="@+id/linearLayout9"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp">
 
             <Button
                 android:layout_width="fill_parent"
@@ -364,7 +384,9 @@
         android:layout_height="fill_parent"
         android:orientation="horizontal"
         android:layout_marginTop="2dp"
-        android:layout_weight="2">
+        android:layout_weight="2"
+        android:paddingTop="15dp"
+        android:paddingBottom="15dp">
 
         <Button
             android:layout_width="fill_parent"
@@ -375,52 +397,65 @@
             android:layout_marginRight="10dp" />
 
 
-        <Button
+        <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:layout_weight="1"
-            android:text = "A"
-            android:id="@+id/A"
-            android:layout_centerInParent="true"
-            android:background="@drawable/roundedkey"
-            android:clickable="false" />
+            android:orientation="horizontal"
+            android:layout_marginBottom="15dp"
+            android:layout_weight=".4"
+            android:layout_marginTop="20dp">
 
+            <Button
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
+                android:text = "A"
+                android:id="@+id/A"
+                android:layout_centerInParent="true"
+                android:background="@drawable/roundedkey"
+                android:clickable="false"
+                android:layout_marginRight="2dp" />
 
-        <Button
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_weight="1"
-            android:text="O"
-            android:id="@+id/O"
-            android:layout_centerInParent="true"
-            android:background="@drawable/roundedkey"
-            android:clickable="false" />
+            <Button
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
+                android:text="O"
+                android:id="@+id/O"
+                android:layout_centerInParent="true"
+                android:background="@drawable/roundedkey"
+                android:clickable="false"
+                android:layout_marginLeft="2dp" />
 
-        <FrameLayout
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:id="@+id/frameLayout"
-            android:layout_weight="1" />
+            <FrameLayout
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:id="@+id/frameLayout"
+                android:layout_weight="1" />
 
-        <Button
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_weight="1"
-            android:text="E"
-            android:id="@+id/_E"
-            android:layout_centerInParent="true"
-            android:background="@drawable/roundedkey"
-            android:clickable="false" />
+            <Button
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
+                android:text="E"
+                android:id="@+id/_E"
+                android:layout_centerInParent="true"
+                android:background="@drawable/roundedkey"
+                android:clickable="false"
+                android:layout_marginRight="2dp" />
 
-        <Button
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_weight="1"
-            android:text="U"
-            android:id="@+id/_U"
-            android:layout_centerInParent="true"
-            android:background="@drawable/roundedkey"
-            android:clickable="false" />
+            <Button
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
+                android:text="U"
+                android:id="@+id/_U"
+                android:layout_centerInParent="true"
+                android:background="@drawable/roundedkey"
+                android:clickable="false"
+                android:layout_marginLeft="2dp" />
+        </LinearLayout>
+
 
         <Button
             android:layout_width="fill_parent"

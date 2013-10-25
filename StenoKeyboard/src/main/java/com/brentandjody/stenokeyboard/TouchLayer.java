@@ -20,8 +20,8 @@ import java.util.List;
  */
 public class TouchLayer extends LinearLayout {
 
-    private static final int TOUCH_RADIUS = 25;
-    private static final int MIN_KBD_HEIGHT = 500;
+    private static final int TOUCH_RADIUS = 20;
+    private static final int MIN_KBD_HEIGHT = 300;
     private List<Button> keys = new ArrayList<Button>();
     private Button fKey;
 
