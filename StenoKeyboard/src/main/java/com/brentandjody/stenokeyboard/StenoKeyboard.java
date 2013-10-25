@@ -1,6 +1,5 @@
 package com.brentandjody.stenokeyboard;
 
-import android.app.ProgressDialog;
 import android.inputmethodservice.InputMethodService;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,12 +25,7 @@ public class StenoKeyboard extends InputMethodService {
     @Override
     public void onCreate() {
         super.onCreate();
-        ProgressDialog progress = new ProgressDialog(this);
-        progress.setTitle("Loading");
-        progress.setMessage("Loading Dictionary...");
-        progress.show();
-        dictionary = new Dictionary(getApplicationContext());
-        progress.dismiss();
+         dictionary = new Dictionary(getApplicationContext());
     }
 
 
