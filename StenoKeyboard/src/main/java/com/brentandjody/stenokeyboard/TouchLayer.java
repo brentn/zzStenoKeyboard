@@ -56,7 +56,7 @@ public class TouchLayer extends LinearLayout {
         int screen_height = size.y;
         int keyboard_height = screen_height / 3;
         if (keyboard_height < MIN_KBD_HEIGHT) keyboard_height = MIN_KBD_HEIGHT;
-        this.getLayoutParams().height = screen_height / 3;
+        this.getLayoutParams().height = keyboard_height;
     }
 
     private void enumerateKeys(View v) {
@@ -133,13 +133,17 @@ public class TouchLayer extends LinearLayout {
 
     public String getStroke() {
         String result = "";
-        Boolean hasVowels = false;
+        Boolean addDash = false;
         for (Button key : keys) {
-            if (key == fKey && (! hasVowels)) {
-                result += "-";
-            }
             if (key.isSelected()) {
-                if ("*AOEU".contains(key.getText())) hasVowels = true;
+                if ("*AOEU".contains(key.getText())) {
+                    addDash = true;
+                } else {
+                    if (addDash) {
+                        result += "-";
+                        addDash = false;
+                    }
+                }
                 result += key.getText();
                 key.setSelected(false);
             }

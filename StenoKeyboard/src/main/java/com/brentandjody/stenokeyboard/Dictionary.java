@@ -148,12 +148,13 @@ public class Dictionary {
         }
     }
 
-    public List<String> getCandidateStrings() {
-        List<String> result = new ArrayList<String>();
-        for (Definition candidate : candidates) {
-            result.add(candidate.getTranslation());
-        }
-        return result;
+    public void addPhraseToHistory(String phrase) {
+
+        updateHistory(strokeQ, phrase);
+    }
+
+    public List<Definition> getCandidates() {
+        return candidates;
     }
 
     private void generateCandidates(String stroke) {
@@ -295,27 +296,6 @@ public class Dictionary {
                 return stack.removeFirst();
             }
             return null;
-        }
-    }
-
-    class Definition {
-        private String mStroke;
-        private String mTranslation;
-        public Definition(String stroke, String translation) {
-            set(stroke, translation);
-        }
-
-        public void set(String stroke, String translation) {
-            mStroke = stroke;
-            mTranslation = translation;
-        }
-
-        public String getStroke() {
-            return mStroke;
-        }
-
-        public String getTranslation() {
-            return mTranslation;
         }
     }
 }
