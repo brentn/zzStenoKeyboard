@@ -14,7 +14,8 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:clickable="false"
-        android:layout_marginBottom="2dp">
+        android:layout_marginBottom="2dp"
+        android:layout_marginTop="10dp">
 
         <Button
             android:layout_width="fill_parent"
@@ -30,7 +31,8 @@
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:layout_weight="1">
+        android:layout_weight="1"
+        android:paddingTop="2dp">
 
         <LinearLayout
             android:orientation="vertical"
@@ -384,9 +386,9 @@
         android:layout_height="fill_parent"
         android:orientation="horizontal"
         android:layout_marginTop="2dp"
-        android:layout_weight="2"
-        android:paddingTop="15dp"
-        android:paddingBottom="15dp">
+        android:layout_weight="1.4"
+        android:paddingTop="20dp"
+        android:baselineAligned="false">
 
         <Button
             android:layout_width="fill_parent"
@@ -401,9 +403,7 @@
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:orientation="horizontal"
-            android:layout_marginBottom="15dp"
-            android:layout_weight=".4"
-            android:layout_marginTop="20dp">
+            android:layout_weight=".4">
 
             <Button
                 android:layout_width="fill_parent"
@@ -463,8 +463,8 @@
             android:text="Send"
             android:id="@+id/send_button"
             android:layout_weight=".86"
-            android:layout_marginLeft="10dp"
-            android:background="@android:color/white" />
+            android:background="@android:color/white"
+            android:layout_marginRight="2dp" />
 
     </LinearLayout>
 
