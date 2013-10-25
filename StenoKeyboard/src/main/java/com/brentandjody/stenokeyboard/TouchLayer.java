@@ -133,18 +133,17 @@ public class TouchLayer extends LinearLayout {
 
     public String getStroke() {
         String result = "";
-        Boolean addDash = false;
+        Boolean addDash = true;
+        Boolean rightSide = false;
         for (Button key : keys) {
             if (key.isSelected()) {
-                if ("*AOEU".contains(key.getText())) {
-                    addDash = true;
-                } else {
-                    if (addDash) {
-                        result += "-";
-                        addDash = false;
-                    }
+                if ("*AOEU".contains(key.getText())) addDash = false;
+                if (key == fKey) rightSide=true;
+                if (rightSide && addDash) {
+                    result += "-";
+                    addDash = false;
                 }
-                result += key.getText();
+                    result += key.getText();
                 key.setSelected(false);
             }
         }
