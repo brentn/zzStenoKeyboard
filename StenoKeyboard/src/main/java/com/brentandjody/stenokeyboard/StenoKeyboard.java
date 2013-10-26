@@ -50,7 +50,7 @@ public class StenoKeyboard extends InputMethodService {
                 String message = dictionary.translate(stroke);
                 populateCandidates(dictionary.getCandidates());
                 //Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
-                getCurrentInputConnection().commitText(message, 1);
+                sendText(message);
             }
         });
         return keyboardView;
@@ -79,7 +79,7 @@ public class StenoKeyboard extends InputMethodService {
                     public void onClick(View view) {
                         String phrase = ((TextView) view).getText().toString();
                         dictionary.addPhraseToHistory(phrase);
-                        getCurrentInputConnection().commitText(phrase+" ", 1);
+                        sendText(phrase+" ");
                         candidatesView.removeAllViews();
                         setCandidatesViewShown(false);
                     }
@@ -96,6 +96,28 @@ public class StenoKeyboard extends InputMethodService {
             count ++;
         }
         setCandidatesViewShown(candidatesView.getChildCount() > 0);
+    }
+
+    private void sendText(String message) {
+        // deals with backspaces
+        if (message.contains("\b")) {
+            // deal with any backspaces at the start first
+            int i = 0;
+            while (message.charAt(i)=='\b')
+                i++;
+            if (i > 0) {
+                getCurrentInputConnection().deleteSurroundingText(i,0);
+                message = message.substring(i);
+            }
+            // split the text on the first backspace, and recurse
+            if (message.contains("\b")) {
+                i = message.indexOf('\b');
+                sendText(message.substring(0,i));
+                sendText(message.substring(i));
+            }
+        } else {
+            getCurrentInputConnection().commitText(message, 1);
+        }
     }
 
 }
