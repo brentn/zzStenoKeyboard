@@ -60,6 +60,7 @@ public class Dictionary {
             generateCandidates(stroke);
             return "";
         }
+        if (stroke.isEmpty()) return "";
         return definitions.get(stroke);
     }
 

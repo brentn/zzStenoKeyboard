@@ -59,7 +59,10 @@
                 android:background="@drawable/topkey"
                 android:clickable="false"
                 android:text="T"
-                android:layout_weight="1" />
+                android:layout_weight="1"
+                android:layout_marginLeft="2dp"
+                android:layout_marginRight="2dp"
+                android:layout_marginBottom="2dp" />
 
             <FrameLayout
                 android:layout_width="fill_parent"
@@ -74,7 +77,9 @@
                 android:background="@drawable/bottomkey"
                 android:clickable="false"
                 android:text="K"
-                android:layout_weight="1" />
+                android:layout_weight="1"
+                android:layout_marginLeft="2dp"
+                android:layout_marginRight="2dp" />
 
         </LinearLayout>
 
