@@ -113,7 +113,8 @@ public class Dictionary {
             translation = (lookup(qString+"/"+stroke));
             if (translation == null) {
                 // the full stroke was not found, so let's break it up
-                translation = definitions.get(qString);
+                if (qString.isEmpty()) translation=null;
+                else translation = definitions.get(qString);
                 if (translation == null) {
                     translation = qString.replace("/"," ");
                 }

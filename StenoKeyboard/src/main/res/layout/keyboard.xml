@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <com.brentandjody.stenokeyboard.TouchLayer xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
-    android:layout_height="300dp"
-    tools:context=".MainActivity"
+    android:layout_height="fill_parent"
     android:orientation="vertical"
     android:id="@+id/keyboard"
     android:background="@android:color/darker_gray"
@@ -37,11 +35,6 @@
                 android:text="S" />
 
         </LinearLayout>
-
-        <FrameLayout
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_weight="@integer/key_padding_weight"></FrameLayout>
 
         <LinearLayout
             android:orientation="vertical"
@@ -82,12 +75,6 @@
                 android:layout_marginRight="2dp" />
 
         </LinearLayout>
-
-        <FrameLayout
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_weight="@integer/key_padding_weight"
-            android:id="@+id/frameLayout2" />
 
         <LinearLayout
             android:orientation="vertical"
@@ -130,12 +117,6 @@
 
         </LinearLayout>
 
-        <FrameLayout
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_weight="@integer/key_padding_weight"
-            android:id="@+id/frameLayout3" />
-
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="fill_parent"
@@ -177,14 +158,6 @@
 
         </LinearLayout>
 
-        <FrameLayout
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_weight="@integer/key_padding_weight"
-            android:id="@+id/frameLayout4" >
-
-        </FrameLayout>
-
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="fill_parent"
@@ -215,8 +188,7 @@
                 android:id="@+id/A"
                 android:layout_centerInParent="true"
                 android:background="@drawable/vowelkey"
-                android:clickable="false"
-                android:layout_marginRight="2dp" />
+                android:clickable="false" />
 
         </LinearLayout>
 
@@ -246,18 +218,7 @@
                 android:id="@+id/O"
                 android:layout_centerInParent="true"
                 android:background="@drawable/vowelkey"
-                android:clickable="false"
-                android:layout_marginLeft="2dp" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="fill_parent"
-            android:layout_height="match_parent"
-            android:minHeight="100dp"
-            android:layout_weight="@integer/key_weight"
-            android:id="@+id/linearLayout10" >
+                android:clickable="false" />
 
         </LinearLayout>
 
@@ -288,8 +249,7 @@
                 android:id="@+id/_E"
                 android:layout_centerInParent="true"
                 android:background="@drawable/vowelkey"
-                android:clickable="false"
-                android:layout_marginRight="2dp" />
+                android:clickable="false" />
         </LinearLayout>
 
         <LinearLayout
@@ -324,16 +284,9 @@
                 android:id="@+id/_U"
                 android:layout_centerInParent="true"
                 android:background="@drawable/vowelkey"
-                android:clickable="false"
-                android:layout_marginLeft="2dp" />
+                android:clickable="false" />
 
         </LinearLayout>
-
-        <FrameLayout
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_weight="@integer/key_padding_weight"
-            android:id="@+id/frameLayout12" />
 
         <LinearLayout
             android:orientation="vertical"
@@ -376,12 +329,6 @@
 
         </LinearLayout>
 
-        <FrameLayout
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_weight="@integer/key_padding_weight"
-            android:id="@+id/frameLayout6" />
-
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="fill_parent"
@@ -422,12 +369,6 @@
                 android:layout_weight="1" />
 
         </LinearLayout>
-
-        <FrameLayout
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_weight="@integer/key_padding_weight"
-            android:id="@+id/frameLayout7" />
 
         <LinearLayout
             android:orientation="vertical"
@@ -470,12 +411,6 @@
 
         </LinearLayout>
 
-        <FrameLayout
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_weight="@integer/key_padding_weight"
-            android:id="@+id/frameLayout8" />
-
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="fill_parent"
@@ -517,12 +452,6 @@
 
         </LinearLayout>
 
-        <FrameLayout
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_weight="@integer/key_padding_weight"
-            android:id="@+id/frameLayout9" />
-
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="fill_parent"
@@ -561,6 +490,16 @@
                 android:clickable="false"
                 android:layout_weight="1"
                 android:text="Z" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="fill_parent"
+            android:layout_height="match_parent"
+            android:minHeight="100dp"
+            android:layout_weight="@integer/key_weight"
+            android:id="@+id/linearLayout10" >
 
         </LinearLayout>
 

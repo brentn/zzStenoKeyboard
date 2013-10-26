@@ -1,16 +1,17 @@
 package com.brentandjody.stenokeyboard;
 
 import android.content.Context;
+import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.graphics.Point;
 import android.util.AttributeSet;
 import android.view.Display;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.ImageButton;
-import android.widget.LinearLayout;
+
+import android.widget.RelativeLayout;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,12 +19,16 @@ import java.util.List;
 /**
  * Created by brent on 20/10/13.
  */
-public class TouchLayer extends LinearLayout {
+public class TouchLayer extends RelativeLayout {
 
-    private static final int TOUCH_RADIUS = 20;
+    private static final int TOUCH_RADIUS = 2;
+    private static final int TOUCH_OFFSET = -10;
     private static final int MIN_KBD_HEIGHT = 300;
+    private static Paint PAINT = new Paint();
+    private Canvas canvas;
     private List<Button> keys = new ArrayList<Button>();
     private Button fKey;
+
 
 
     public TouchLayer(Context context) {
@@ -39,8 +44,11 @@ public class TouchLayer extends LinearLayout {
     }
 
     @Override
-    protected void onFinishInflate() {
-        super.onFinishInflate();
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+        this.canvas = canvas;
+        PAINT.setStyle(Paint.Style.FILL);
+        PAINT.setColor(getResources().getColor(android.R.color.holo_blue_bright));
     }
 
     @Override
@@ -98,16 +106,15 @@ public class TouchLayer extends LinearLayout {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        float lastX, lastY;
         // iterate over all keys, and toggle all those within TOUCH_RADIUS
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
-            lastX = event.getX();
-            lastY = event.getY();
-            checkKeyPressed(event, event.getX(), event.getY());
+            drawTouch(event.getX() + TOUCH_OFFSET, event.getY());
+            checkKeyPressed(event, event.getX() + TOUCH_OFFSET, event.getY());
         }
         if (event.getAction() == MotionEvent.ACTION_MOVE) {
             for (int i=0; i< event.getHistorySize(); i++){
-                checkKeyPressed(event, event.getHistoricalX(i), event.getHistoricalY(i));
+                drawTouch(event.getHistoricalX(i) + TOUCH_OFFSET, event.getHistoricalY(i));
+                checkKeyPressed(event, event.getHistoricalX(i) + TOUCH_OFFSET, event.getHistoricalY(i));
             }
             checkKeyPressed(event, event.getX(), event.getY());
         }
@@ -115,6 +122,11 @@ public class TouchLayer extends LinearLayout {
             onStrokeCompleteListener.onStrokeComplete();
         }
         return true;
+    }
+
+    private void drawTouch(float x, float y) {
+
+        canvas.drawCircle(x, y, TOUCH_RADIUS, PAINT);
     }
 
     private void checkKeyPressed(MotionEvent event, float X, float Y) {
