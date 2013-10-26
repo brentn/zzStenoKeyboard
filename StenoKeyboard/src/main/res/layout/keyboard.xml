@@ -207,7 +207,7 @@
                 android:layout_height="fill_parent"
                 android:layout_weight="1"
                 android:text="A"
-                android:id="@+id/button4"
+                android:id="@+id/A"
                 android:layout_centerInParent="true"
                 android:background="@drawable/vowelkey"
                 android:clickable="false"
@@ -280,7 +280,7 @@
                 android:layout_height="fill_parent"
                 android:layout_weight="@integer/key_weight"
                 android:text="E"
-                android:id="@+id/button3"
+                android:id="@+id/_E"
                 android:layout_centerInParent="true"
                 android:background="@drawable/vowelkey"
                 android:clickable="false"
@@ -316,7 +316,7 @@
                 android:layout_height="fill_parent"
                 android:layout_weight="1"
                 android:text="U"
-                android:id="@+id/button"
+                android:id="@+id/_U"
                 android:layout_centerInParent="true"
                 android:background="@drawable/vowelkey"
                 android:clickable="false"
@@ -558,35 +558,6 @@
                 android:text="Z" />
 
         </LinearLayout>
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:orientation="horizontal"
-        android:layout_marginTop="2dp"
-        android:layout_weight="4"
-        android:baselineAligned="false">
-
-        <Button
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="..."
-            android:id="@+id/button2"
-            android:layout_weight=".98"
-            android:layout_marginRight="10dp" />
-
-
-        <Button
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="Send"
-            android:id="@+id/send_button"
-            android:layout_weight=".86"
-            android:background="@android:color/white"
-            android:layout_marginRight="5dp"
-            android:layout_marginLeft="5dp" />
 
     </LinearLayout>
 

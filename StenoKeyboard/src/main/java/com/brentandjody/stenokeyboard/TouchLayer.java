@@ -87,22 +87,33 @@ public class TouchLayer extends LinearLayout {
         keys.add((Button) v.findViewById(R.id._Z));
     }
 
+    private OnStrokeCompleteListener onStrokeCompleteListener;
+    public interface OnStrokeCompleteListener {
+        public void onStrokeComplete();
+    }
+
+    public void setOnStrokeCompleteListener(OnStrokeCompleteListener listener) {
+        onStrokeCompleteListener = listener;
+    }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        float lastX, lastY;
         // iterate over all keys, and toggle all those within TOUCH_RADIUS
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
+            lastX = event.getX();
+            lastY = event.getY();
             checkKeyPressed(event, event.getX(), event.getY());
         }
-//        switch (event.getAction() & MotionEvent.ACTION_MASK) {
-//            case MotionEvent.ACTION_DOWN:
-//                checkKeyPressed(event, event.getX(), event.getY());
-//                break;
-//            case MotionEvent.ACTION_POINTER_DOWN:
-//                for (int i=0; i < event.getPointerCount(); i++) {
-//                    checkKeyPressed(event, event.getX(i), event.getY(i));
-//                }
-//        }
+        if (event.getAction() == MotionEvent.ACTION_MOVE) {
+            for (int i=0; i< event.getHistorySize(); i++){
+                checkKeyPressed(event, event.getHistoricalX(i), event.getHistoricalY(i));
+            }
+            checkKeyPressed(event, event.getX(), event.getY());
+        }
+        if (event.getAction() == MotionEvent.ACTION_UP) {
+            onStrokeCompleteListener.onStrokeComplete();
+        }
         return true;
     }
 
@@ -125,7 +136,7 @@ public class TouchLayer extends LinearLayout {
             bottom = top+key.getHeight();
             if ((maxX > left) && (minX < right)) {
                 if ((maxY > top) && (minY < bottom)) {
-                    key.setSelected(! key.isSelected());
+                    key.setSelected(true);
                 }
             }
         }

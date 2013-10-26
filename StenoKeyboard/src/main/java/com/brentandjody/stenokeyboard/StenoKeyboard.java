@@ -27,7 +27,7 @@ public class StenoKeyboard extends InputMethodService {
     @Override
     public void onCreate() {
         super.onCreate();
-         dictionary = new Dictionary(getApplicationContext());
+        dictionary = new Dictionary(getApplicationContext());
     }
 
 
@@ -42,14 +42,12 @@ public class StenoKeyboard extends InputMethodService {
         super.onCreateInputView();
         LayoutInflater layoutInflater = getLayoutInflater();
         keyboardView = (TouchLayer) layoutInflater.inflate(R.layout.keyboard, null);
-        sendButton = (Button) keyboardView.findViewById(R.id.send_button);
-        sendButton.setOnClickListener(new View.OnClickListener() {
+        keyboardView.setOnStrokeCompleteListener(new TouchLayer.OnStrokeCompleteListener() {
             @Override
-            public void onClick(View view) {
+            public void onStrokeComplete() {
                 String stroke = keyboardView.getStroke();
                 String message = dictionary.translate(stroke);
                 populateCandidates(dictionary.getCandidates());
-                //Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
                 sendText(message);
             }
         });
@@ -79,7 +77,7 @@ public class StenoKeyboard extends InputMethodService {
                     public void onClick(View view) {
                         String phrase = ((TextView) view).getText().toString();
                         dictionary.addPhraseToHistory(phrase);
-                        sendText(phrase+" ");
+                        sendText(phrase + " ");
                         candidatesView.removeAllViews();
                         setCandidatesViewShown(false);
                     }
@@ -103,7 +101,7 @@ public class StenoKeyboard extends InputMethodService {
         if (message.contains("\b")) {
             // deal with any backspaces at the start first
             int i = 0;
-            while (message.charAt(i)=='\b')
+            while (i < message.length() && message.charAt(i)=='\b')
                 i++;
             if (i > 0) {
                 getCurrentInputConnection().deleteSurroundingText(i,0);

@@ -2,11 +2,15 @@ package com.brentandjody.stenokeyboard;
 
 import android.content.Context;
 import android.content.res.AssetManager;
+import android.os.AsyncTask;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Deque;
@@ -40,29 +44,7 @@ public class Dictionary {
     }
 
     public void load(String filename) {
-        String line, stroke, translation;
-        String[] fields;
-        if (filename == null || filename.isEmpty())
-            throw new IllegalArgumentException("Dictionary filename not provided");
-        try {
-            AssetManager am = context.getAssets();
-            InputStream filestream = am.open(filename);
-            InputStreamReader reader = new InputStreamReader(filestream);
-            BufferedReader lines = new BufferedReader(reader);
-            while ((line = lines.readLine()) != null) {
-                fields = line.split("\"");
-                if ((fields.length >= 3) && (fields[3].length() > 0)) {
-                    stroke = fields[1];
-                    translation = fields[3];
-                    definitions.put(stroke, translation);
-                }
-            }
-            lines.close();
-            reader.close();
-            filestream.close();
-        } catch (IOException e) {
-            System.err.println("Dictionary File: "+filename+" could not be found");
-        }
+        new loadDictionary().execute(filename);
     }
 
     public boolean isLoaded() {
@@ -74,7 +56,7 @@ public class Dictionary {
     // return null if not found
     // return empty string if ambiguous
         candidates.clear();
-        if (((Collection) definitions.prefixMatch(stroke)).size() > 1) {
+        if ((!stroke.isEmpty()) && (((Collection) definitions.prefixMatch(stroke)).size() > 1)) {
             generateCandidates(stroke);
             return "";
         }
@@ -297,5 +279,44 @@ public class Dictionary {
             }
             return null;
         }
+    }
+
+    private class loadDictionary extends AsyncTask<String, Integer, Long> {
+        protected Long doInBackground(String... dictionaries) {
+            int count = dictionaries.length;
+            String line, stroke, translation;
+            String[] fields;
+            for (int i = 0; i < count; i++) {
+                if (dictionaries[i] == null || dictionaries[i].isEmpty())
+                    throw new IllegalArgumentException("Dictionary filename not provided");
+                try {
+                    AssetManager am = context.getAssets();
+                    InputStream filestream = am.open(dictionaries[i]);
+                    InputStreamReader reader = new InputStreamReader(filestream);
+                    BufferedReader lines = new BufferedReader(reader);
+                    while ((line = lines.readLine()) != null) {
+                        fields = line.split("\"");
+                        if ((fields.length >= 3) && (fields[3].length() > 0)) {
+                            stroke = fields[1];
+                            translation = fields[3];
+                            definitions.put(stroke, translation);
+                        }
+                    }
+                    lines.close();
+                    reader.close();
+                    filestream.close();
+                } catch (IOException e) {
+                    System.err.println("Dictionary File: "+dictionaries[i]+" could not be found");
+                }
+                publishProgress((int) ((i / (float) count) * 100));
+                // Escape early if cancel() is called
+                if (isCancelled()) break;
+            }
+            return (long) count;
+        }
+
+      protected void onPostExecute(Long result) {
+          Toast.makeText(context, "Dictionary Loaded", Toast.LENGTH_LONG).show();
+      }
     }
 }
