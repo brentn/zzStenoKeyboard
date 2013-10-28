@@ -43,14 +43,12 @@ public class TestDictionary extends AndroidTestCase {
         assertEquals(dictionary.lookup("HR-G/HREU"), "willingly");
         assertEquals(dictionary.lookup("RE/SAOEF"), "receive");
         assertEquals(dictionary.lookup("A*UT/EPBT/EUBG"), "authentic");
-        assertEquals(dictionary.lookup("SPEUPB/A/ROUPBD/SKPHRAPL"), "spin around!");
         //stroke-by-stroke, should not combine
         assertEquals(dictionary.lookup("A*UT"), "");
         assertEquals(dictionary.lookup("EPBT"), "");
         assertEquals(dictionary.lookup("EUBG"), "");
-        //phrase
-        assertEquals(dictionary.lookup("SPEUPB/A/ROUPBD/SKPHRAPL"), "spin around! ");
-        assertEquals(dictionary.lookup("/KPA/WHA/PWO/U/THEU/KW-PL"), "What do you think? ");
+        //no stroke exists, but one that starts with this does (SPEUPB/A*UF)
+        assertEquals(dictionary.lookup("SPEUPB/A"), null);
     }
 
     public void testTranslate() {
@@ -85,6 +83,9 @@ public class TestDictionary extends AndroidTestCase {
         assertEquals(dictionary.translate("TPAEUR"), "");
         assertEquals(dictionary.translate("KWREU"), "");
         assertEquals(dictionary.translate("TAEULS"), "fairy tails ");
+        //phrase
+        assertEquals(dictionary.translate("SPEUPB/A/ROUPBD/RAODZ"), "spin around roads ");
+        assertEquals(dictionary.translate("KPA/WHA/TKO/U/THEU/-G"), "  What do you thinking ");
     }
 
     public void testUndo() {

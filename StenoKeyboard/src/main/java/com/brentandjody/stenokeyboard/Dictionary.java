@@ -3,14 +3,12 @@ package com.brentandjody.stenokeyboard;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.os.AsyncTask;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Deque;
@@ -62,7 +60,8 @@ public class Dictionary {
         }
         candidates.clear();
         if (stroke.isEmpty()) return null;
-        if ((((Collection) definitions.prefixMatch(stroke)).size() > 1)) {
+        // if this translation *could* be unfinished, get possible candidates, and return ""
+        if ((((Collection) definitions.prefixMatch(stroke+"/")).size() > 0)) {
             generateCandidates(stroke);
             return "";
         }
@@ -147,9 +146,14 @@ public class Dictionary {
     }
 
     private void generateCandidates(String stroke) {
+        Definition candidate;
         candidates.clear();
-        for (String candidateStroke : definitions.prefixMatch(stroke)) {
-            Definition candidate = new Definition(candidateStroke, definitions.get(candidateStroke));
+        // add the translation for the base stroke
+        candidate = new Definition(stroke,(definitions.get(stroke)));
+        candidates.add(candidate);
+        // add translations that begin with this stroke
+        for (String candidateStroke : definitions.prefixMatch(stroke+"/")) {
+            candidate = new Definition(candidateStroke, definitions.get(candidateStroke));
             candidates.add(candidate);
         }
     }
