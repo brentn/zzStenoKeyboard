@@ -47,13 +47,17 @@ public class StenoKeyboard extends InputMethodService {
         keyboardView.setOnStrokeCompleteListener(new TouchLayer.OnStrokeCompleteListener() {
             @Override
             public void onStrokeComplete() {
-                String stroke = keyboardView.getStroke();
-                String message = dictionary.translate(stroke);
-                populateCandidates(dictionary.getCandidates());
-                if (debug) {
-                    Toast.makeText(getApplicationContext(), "sent: "+stroke, Toast.LENGTH_SHORT).show();
+                if (dictionary.isLoaded()) {
+                    String stroke = keyboardView.getStroke();
+                    String message = dictionary.translate(stroke);
+                    populateCandidates(dictionary.getCandidates());
+                    if (debug) {
+                        Toast.makeText(getApplicationContext(), "sent: "+stroke, Toast.LENGTH_SHORT).show();
+                    }
+                    sendText(message);
+                } else {
+                    Toast.makeText(getApplicationContext(), "Dictionary not yet loaded", Toast.LENGTH_SHORT).show();
                 }
-                sendText(message);
             }
         });
         return keyboardView;

@@ -253,7 +253,7 @@ public class TouchLayer extends RelativeLayout {
                 key.setSelected(false);
             }
         }
-        if (numberKey.isSelected()) {
+        if (chord.contains("#")) {
             chord = convertNumbers(chord);
         }
         result = constructStroke(chord);
@@ -261,20 +261,20 @@ public class TouchLayer extends RelativeLayout {
     }
 
     private List<String> convertNumbers(List<String> chord) {
-        String thisKey;
+        List<String> result = new ArrayList<String>();
         Boolean numeral = false;
-        for (int i=0; i<chord.size(); i++) {
-            thisKey = chord.get(i);
-            if (NUMBER_KEYS.contains(thisKey)) {
-                chord.set(i, NUMBER_KEYS.get(thisKey));
+        for (String thisKey : chord) {
+            if (NUMBER_KEYS.containsKey(thisKey)) {
+                result.add(NUMBER_KEYS.get(thisKey));
                 numeral = true;
+            } else {
+                result.add(thisKey);
             }
-            i++;
         }
         if (numeral) {
-            numberKey.setSelected(false);
+            result.remove("#");
         }
-        return chord;
+        return result;
 
     }
 
