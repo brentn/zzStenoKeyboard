@@ -1,14 +1,10 @@
 package com.brentandjody.stenokeyboard.tests;
 
-import android.content.Context;
 import android.test.AndroidTestCase;
-import android.test.AndroidTestRunner;
-import android.test.IsolatedContext;
 
 import com.brentandjody.stenokeyboard.Definition;
 import com.brentandjody.stenokeyboard.Dictionary;
 
-import junit.framework.TestCase;
 
 import java.util.List;
 
@@ -47,10 +43,14 @@ public class TestDictionary extends AndroidTestCase {
         assertEquals(dictionary.lookup("HR-G/HREU"), "willingly");
         assertEquals(dictionary.lookup("RE/SAOEF"), "receive");
         assertEquals(dictionary.lookup("A*UT/EPBT/EUBG"), "authentic");
+        assertEquals(dictionary.lookup("SPEUPB/A/ROUPBD/SKPHRAPL"), "spin around!");
         //stroke-by-stroke, should not combine
         assertEquals(dictionary.lookup("A*UT"), "");
         assertEquals(dictionary.lookup("EPBT"), "");
         assertEquals(dictionary.lookup("EUBG"), "");
+        //phrase
+        assertEquals(dictionary.lookup("SPEUPB/A/ROUPBD/SKPHRAPL"), "spin around! ");
+        assertEquals(dictionary.lookup("/KPA/WHA/PWO/U/THEU/KW-PL"), "What do you think? ");
     }
 
     public void testTranslate() {
