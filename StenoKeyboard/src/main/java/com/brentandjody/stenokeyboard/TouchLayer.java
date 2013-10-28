@@ -2,7 +2,9 @@ package com.brentandjody.stenokeyboard;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.Point;
 import android.util.AttributeSet;
 import android.view.Display;
@@ -14,6 +16,9 @@ import android.widget.Button;
 import android.widget.RelativeLayout;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Hashtable;
 import java.util.List;
 
 /**
@@ -21,41 +26,72 @@ import java.util.List;
  */
 public class TouchLayer extends RelativeLayout {
 
+    private static final Hashtable<String,String> NUMBER_KEYS = new Hashtable<String, String>() {{
+        put("S-", "1-");
+        put("T-", "2-");
+        put("P-", "3-");
+        put("H-", "4-");
+        put("A-", "5-");
+        put("O-", "0-");
+        put("-F", "-6");
+        put("-P", "-7");
+        put("-L", "-8");
+        put("-T", "-9");
+    }};
     private static final int TOUCH_RADIUS = 2;
-    private static final int TOUCH_OFFSET = -10;
-    private static final int MIN_KBD_HEIGHT = 300;
+    private static final int NUM_PATHS = 2;
+    private static final int MIN_KBD_HEIGHT = 400;
     private static Paint PAINT = new Paint();
-    private Canvas canvas;
     private List<Button> keys = new ArrayList<Button>();
+    private Path[] paths = new Path[NUM_PATHS];
+    private Button sendKey;
     private Button fKey;
 
 
 
     public TouchLayer(Context context) {
         super(context);
+        init();
     }
 
     public TouchLayer(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
+        init();
     }
 
     public TouchLayer(Context context, AttributeSet attrs) {
         super(context, attrs);
+        init();
     }
 
-    @Override
+    private void init() {
+        PAINT.setColor(getResources().getColor(android.R.color.holo_blue_bright));
+        PAINT.setAntiAlias(true);
+        PAINT.setDither(true);
+        PAINT.setStyle(Paint.Style.STROKE);
+        PAINT.setStrokeJoin(Paint.Join.ROUND);
+        PAINT.setStrokeCap(Paint.Cap.ROUND);
+        PAINT.setStrokeWidth(12);
+    }
+
+            @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        this.canvas = canvas;
-        PAINT.setStyle(Paint.Style.FILL);
-        PAINT.setColor(getResources().getColor(android.R.color.holo_blue_bright));
+        for (int i=0; i<NUM_PATHS; i++) {
+            canvas.drawPath(paths[i], PAINT);
+        }
     }
 
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         super.onLayout(changed, l, t, r, b);
+        // find letter keys
         keys.clear();
         enumerateKeys(this);
+        // initialize paths
+        for (int i=0; i<NUM_PATHS; i++) {
+            paths[i] = new Path();
+        }
         // all this is to set the height of the keyboard
         WindowManager wm = (WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE);
         Display display = wm.getDefaultDisplay();
@@ -70,6 +106,7 @@ public class TouchLayer extends RelativeLayout {
     private void enumerateKeys(View v) {
         //list steno keys IN ORDER
         fKey = (Button) v.findViewById(R.id._F);
+        sendKey = (Button) v.findViewById(R.id.send_button);
         keys.add((Button) v.findViewById(R.id.number_bar));
         keys.add((Button) v.findViewById(R.id.S));
         keys.add((Button) v.findViewById(R.id.T));
@@ -106,72 +143,157 @@ public class TouchLayer extends RelativeLayout {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        // iterate over all keys, and toggle all those within TOUCH_RADIUS
-        if (event.getAction() == MotionEvent.ACTION_DOWN) {
-            drawTouch(event.getX() + TOUCH_OFFSET, event.getY());
-            checkKeyPressed(event, event.getX() + TOUCH_OFFSET, event.getY());
-        }
-        if (event.getAction() == MotionEvent.ACTION_MOVE) {
-            for (int i=0; i< event.getHistorySize(); i++){
-                drawTouch(event.getHistoricalX(i) + TOUCH_OFFSET, event.getHistoricalY(i));
-                checkKeyPressed(event, event.getHistoricalX(i) + TOUCH_OFFSET, event.getHistoricalY(i));
+        // drag to select, touch to toggle
+        // multi-touch for both of above
+        // implement onstrokecompletelistener, in case we use it later
+        float x, y;
+        int i;
+        switch (event.getActionMasked()) {
+            case MotionEvent.ACTION_DOWN: {
+                i = event.getActionIndex();
+                x = event.getX(i);
+                y = event.getY(i);
+                paths[i].reset();
+                paths[i].moveTo(x, y);
+                toggleKeyAt(x, y);
+                break;
             }
-            checkKeyPressed(event, event.getX(), event.getY());
-        }
-        if (event.getAction() == MotionEvent.ACTION_UP) {
-            onStrokeCompleteListener.onStrokeComplete();
+            case MotionEvent.ACTION_MOVE: {
+                i = event.getActionIndex();
+                selectKeys(event);
+                invalidate();
+                break;
+            }
+            case MotionEvent.ACTION_UP: {
+                sendKey.setSelected(false);
+                i = event.getActionIndex();
+                paths[i].reset();
+                break;
+            }
         }
         return true;
     }
 
-    private void drawTouch(float x, float y) {
-
-        canvas.drawCircle(x, y, TOUCH_RADIUS, PAINT);
+    private void toggleKeyAt(float x, float y) {
+        Point pointer = new Point();
+        Point offset = getScreenOffset(this);
+        pointer.set((int)x+offset.x, (int)y+offset.y);
+        if (pointerOnKey(pointer, sendKey)) {
+            sendKey.setSelected(true);
+            onStrokeCompleteListener.onStrokeComplete();
+            return;
+        }
+        for (Button key : keys) {
+            if (pointerOnKey(pointer, key)) {
+                key.setSelected(! key.isSelected());
+                return;
+            }
+        }
     }
 
-    private void checkKeyPressed(MotionEvent event, float X, float Y) {
-        float top, left, bottom, right;
-        int[] location = new int[2];
-        this.getLocationOnScreen(location);
-        int Xoffset = location[0];
-        int Yoffset = location[1];
-        float minX = X + Xoffset - TOUCH_RADIUS;
-        float maxX = X + Xoffset + TOUCH_RADIUS;
-        float minY = Y + Yoffset - TOUCH_RADIUS;
-        float maxY = Y + Yoffset + TOUCH_RADIUS;
-        for (Button key:keys) {
-
-            key.getLocationOnScreen(location);
-            left = location[0];
-            top = location[1];
-            right = left+key.getWidth();
-            bottom = top+key.getHeight();
-            if ((maxX > left) && (minX < right)) {
-                if ((maxY > top) && (minY < bottom)) {
+    private void selectKeys(MotionEvent e) {
+        Point pointer = new Point();
+        Point offset = getScreenOffset(this);
+        int i = e.getActionIndex();
+        for (int n=0; n<e.getHistorySize(); n++) {
+            pointer.set((int)e.getHistoricalX(i, n)+offset.x, (int)e.getHistoricalY(i, n)+offset.y);
+            paths[i].lineTo(e.getHistoricalX(i, n), e.getHistoricalY(i, n));
+            if ((!sendKey.isSelected()) && pointerOnKey(pointer, sendKey)) {
+                sendKey.setSelected(true);
+                onStrokeCompleteListener.onStrokeComplete();
+            }
+            for (Button key : keys) {
+                if (pointerOnKey(pointer, key)) {
                     key.setSelected(true);
                 }
             }
         }
     }
 
+    private Point getScreenOffset(View v) {
+        Point result = new Point();
+        int[] location = new int[2];
+        v.getLocationOnScreen(location);
+        result.set(location[0], location[1]);
+        return result;
+    }
+
+    private Boolean pointerOnKey(Point p, View key) {
+        Point topLeft = new Point();
+        Point bottomRight = new Point();
+        topLeft = getScreenOffset(key);
+        bottomRight.set(topLeft.x+key.getWidth(),
+                topLeft.y+key.getHeight());
+        if ((p.x < topLeft.x) || (p.x > bottomRight.x)) return false;
+        if ((p.y < topLeft.y) || (p.y > bottomRight.y)) return false;
+        return true;
+    }
+
     public String getStroke() {
         String result = "";
-        Boolean addDash = true;
-        Boolean rightSide = false;
+        List<String> chord = new ArrayList<String>();
         for (Button key : keys) {
             if (key.isSelected()) {
-                if ("*AOEU".contains(key.getText())) addDash = false;
-                if (key == fKey) rightSide=true;
-                if (rightSide && addDash) {
-                    result += "-";
-                    addDash = false;
-                }
-                    result += key.getText();
+                chord.add(key.getHint().toString());
                 key.setSelected(false);
+            }
+        }
+        if (chord.contains("#")) {
+            chord = convertNumbers(chord);
+        }
+        result = constructStroke(chord);
+        return result;
+    }
+
+    private List<String> convertNumbers(List<String> chord) {
+        String thisKey;
+        Boolean numeral = false;
+        for (int i=0; i<chord.size(); i++) {
+            thisKey = chord.get(i);
+            if (NUMBER_KEYS.contains(thisKey)) {
+                chord.set(i, NUMBER_KEYS.get(thisKey));
+                numeral = true;
+            }
+            i++;
+        }
+        if (numeral) {
+            chord.remove("#");
+        }
+        return chord;
+
+    }
+
+    private String constructStroke(List<String> chord) {
+        String result = "";
+        String suffix = "";
+        if (! Collections.disjoint(chord, Arrays.asList("A-", "O-", "5-", "0-", "-E", "-U", "*"))) {
+            for (String key : chord) {
+                result += key.replace("-","");
+            }
+        } else {
+            for (String key : chord) {
+                if (key == "#" || key.charAt(key.length()-1) == '-') {
+                    result += key.replace("-", "");
+                }
+                if (key.charAt(0) == '-') {
+                    suffix += key.replace("-", "");
+                }
+            }
+            if (! suffix.isEmpty()) {
+                result += "-"+suffix;
             }
         }
         return result;
     }
 
+    // For Testing
+    public Button getKey(String label) {
+        for (Button key : keys) {
+            if (key.getHint().toString().equals(label)) {
+                return key;
+            }
+        }
+        return null;
+    }
 
 }

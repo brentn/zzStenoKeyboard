@@ -32,7 +32,8 @@
                 android:paddingLeft="20dip"
                 android:paddingRight="30dip"
                 android:clickable="false"
-                android:text="S" />
+                android:text="S"
+                android:hint="S-" />
 
         </LinearLayout>
 
@@ -55,7 +56,7 @@
                 android:layout_weight="1"
                 android:layout_marginLeft="2dp"
                 android:layout_marginRight="2dp"
-                android:layout_marginBottom="2dp" />
+                android:hint="T-" />
 
             <FrameLayout
                 android:layout_width="fill_parent"
@@ -72,7 +73,8 @@
                 android:text="K"
                 android:layout_weight="1"
                 android:layout_marginLeft="2dp"
-                android:layout_marginRight="2dp" />
+                android:layout_marginRight="2dp"
+                android:hint="K-" />
 
         </LinearLayout>
 
@@ -93,9 +95,9 @@
                 android:layout_marginLeft="2dp"
                 android:layout_marginRight="2dp"
                 android:clickable="false"
-                android:layout_marginBottom="2dp"
                 android:layout_weight="1"
-                android:text="P" />
+                android:text="P"
+                android:hint="P-" />
 
             <FrameLayout
                 android:layout_width="fill_parent"
@@ -113,7 +115,8 @@
                 android:layout_marginLeft="2dp"
                 android:clickable="false"
                 android:text="W"
-                android:layout_weight="1" />
+                android:layout_weight="1"
+                android:hint="W-" />
 
         </LinearLayout>
 
@@ -134,9 +137,9 @@
                 android:layout_marginLeft="2dp"
                 android:layout_marginRight="2dp"
                 android:clickable="false"
-                android:layout_marginBottom="2dp"
                 android:layout_weight="1"
-                android:text="H" />
+                android:text="H"
+                android:hint="H-" />
 
             <FrameLayout
                 android:layout_width="fill_parent"
@@ -154,7 +157,8 @@
                 android:layout_marginLeft="2dp"
                 android:clickable="false"
                 android:text="R"
-                android:layout_weight="1" />
+                android:layout_weight="1"
+                android:hint="R-" />
 
         </LinearLayout>
 
@@ -173,7 +177,10 @@
                 android:id="@+id/number_bar"
                 android:background="@drawable/numberbar"
                 android:clickable="false"
-                android:layout_weight="1" />
+                android:layout_weight="1"
+                android:layout_marginBottom="25dp"
+                android:layout_marginLeft="2dp"
+                android:hint="#" />
 
             <FrameLayout
                 android:layout_width="fill_parent"
@@ -188,7 +195,11 @@
                 android:id="@+id/A"
                 android:layout_centerInParent="true"
                 android:background="@drawable/vowelkey"
-                android:clickable="false" />
+                android:clickable="false"
+                android:layout_marginTop="-25dp"
+                android:layout_marginRight="2dp"
+                android:layout_marginLeft="2dp"
+                android:hint="A-" />
 
         </LinearLayout>
 
@@ -218,7 +229,11 @@
                 android:id="@+id/O"
                 android:layout_centerInParent="true"
                 android:background="@drawable/vowelkey"
-                android:clickable="false" />
+                android:clickable="false"
+                android:layout_marginTop="-40dp"
+                android:layout_marginLeft="2dp"
+                android:layout_marginRight="2dp"
+                android:hint="O-" />
 
         </LinearLayout>
 
@@ -249,7 +264,11 @@
                 android:id="@+id/_E"
                 android:layout_centerInParent="true"
                 android:background="@drawable/vowelkey"
-                android:clickable="false" />
+                android:clickable="false"
+                android:layout_marginTop="-40dp"
+                android:layout_marginLeft="2dp"
+                android:layout_marginRight="2dp"
+                android:hint="-E" />
         </LinearLayout>
 
         <LinearLayout
@@ -268,7 +287,10 @@
                 android:background="@drawable/numberbar"
                 android:clickable="false"
                 android:text="*"
-                android:layout_weight="1" />
+                android:layout_weight="1"
+                android:layout_marginBottom="25dp"
+                android:layout_marginRight="2dp"
+                android:hint="*" />
 
             <FrameLayout
                 android:layout_width="fill_parent"
@@ -284,7 +306,11 @@
                 android:id="@+id/_U"
                 android:layout_centerInParent="true"
                 android:background="@drawable/vowelkey"
-                android:clickable="false" />
+                android:clickable="false"
+                android:layout_marginTop="-25dp"
+                android:layout_marginLeft="2dp"
+                android:layout_marginRight="2dp"
+                android:hint="-U" />
 
         </LinearLayout>
 
@@ -305,9 +331,9 @@
                 android:layout_marginRight="2dp"
                 android:layout_marginLeft="2dp"
                 android:clickable="false"
-                android:layout_marginBottom="2dp"
                 android:layout_weight="1"
-                android:text="F" />
+                android:text="F"
+                android:hint="-F" />
 
             <FrameLayout
                 android:layout_width="fill_parent"
@@ -325,7 +351,8 @@
                 android:layout_marginRight="2dp"
                 android:clickable="false"
                 android:text="R"
-                android:layout_weight="1" />
+                android:layout_weight="1"
+                android:hint="-R" />
 
         </LinearLayout>
 
@@ -346,9 +373,9 @@
                 android:layout_marginLeft="2dp"
                 android:layout_marginRight="2dp"
                 android:clickable="false"
-                android:layout_marginBottom="2dp"
                 android:layout_weight="1"
-                android:text="P" />
+                android:text="P"
+                android:hint="-P" />
 
             <FrameLayout
                 android:layout_width="fill_parent"
@@ -366,7 +393,8 @@
                 android:layout_marginLeft="2dp"
                 android:clickable="false"
                 android:text="B"
-                android:layout_weight="1" />
+                android:layout_weight="1"
+                android:hint="-B" />
 
         </LinearLayout>
 
@@ -387,9 +415,9 @@
                 android:layout_marginRight="2dp"
                 android:layout_marginLeft="2dp"
                 android:clickable="false"
-                android:layout_marginBottom="2dp"
                 android:layout_weight="1"
-                android:text="L" />
+                android:text="L"
+                android:hint="-L" />
 
             <FrameLayout
                 android:layout_width="fill_parent"
@@ -407,7 +435,8 @@
                 android:layout_marginRight="2dp"
                 android:clickable="false"
                 android:text="G"
-                android:layout_weight="1" />
+                android:layout_weight="1"
+                android:hint="-G" />
 
         </LinearLayout>
 
@@ -428,9 +457,9 @@
                 android:layout_marginLeft="2dp"
                 android:layout_marginRight="2dp"
                 android:clickable="false"
-                android:layout_marginBottom="2dp"
                 android:layout_weight="1"
-                android:text="T" />
+                android:text="T"
+                android:hint="-T" />
 
             <FrameLayout
                 android:layout_width="fill_parent"
@@ -448,7 +477,8 @@
                 android:layout_marginLeft="2dp"
                 android:clickable="false"
                 android:text="S"
-                android:layout_weight="1" />
+                android:layout_weight="1"
+                android:hint="-S" />
 
         </LinearLayout>
 
@@ -469,9 +499,9 @@
                 android:layout_marginLeft="2dp"
                 android:layout_marginRight="2dp"
                 android:clickable="false"
-                android:layout_marginBottom="2dp"
                 android:layout_weight="1"
-                android:text="D" />
+                android:text="D"
+                android:hint="-D" />
 
             <FrameLayout
                 android:layout_width="fill_parent"
@@ -489,7 +519,8 @@
                 android:layout_marginLeft="2dp"
                 android:clickable="false"
                 android:layout_weight="1"
-                android:text="Z" />
+                android:text="Z"
+                android:hint="-Z" />
 
         </LinearLayout>
 
@@ -499,10 +530,22 @@
             android:layout_height="match_parent"
             android:minHeight="100dp"
             android:layout_weight="@integer/key_weight"
-            android:id="@+id/linearLayout10" >
+            android:id="@+id/linearLayout14">
+
+            <Button
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:id="@+id/send_button"
+                android:layout_centerInParent="true"
+                android:background="@drawable/sendbutton"
+                android:cropToPadding="true"
+                android:clickable="false"
+                android:text="S         E         N         D"
+                android:layout_marginLeft="4dp" />
 
         </LinearLayout>
 
     </LinearLayout>
+
 
 </com.brentandjody.stenokeyboard.TouchLayer>

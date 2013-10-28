@@ -31,6 +31,7 @@ public class Dictionary {
 
     private static final String DICTFILE = "dict.json";
     private static TST<String> definitions = new TST<String>();
+    private static Boolean loaded = false;
     private Deque<String> strokeQ = new LinkedBlockingDeque<String>();
     private List<Definition> candidates = new ArrayList<Definition>();
     private History history = new History();
@@ -40,7 +41,7 @@ public class Dictionary {
 
     public Dictionary(Context c) {
         context = c;
-        if (! isLoaded()) load(DICTFILE);
+        if (! loaded) load(DICTFILE);
     }
 
     public void load(String filename) {
@@ -48,19 +49,23 @@ public class Dictionary {
     }
 
     public boolean isLoaded() {
-        return (definitions.size() > 0);
+        return loaded;
     }
 
     public String lookup(String stroke) {
     // basic lookup, no cacheing
     // return null if not found
     // return empty string if ambiguous
+        if (! loaded) {
+            Toast.makeText(context, "Dictionary not yet loaded...", Toast.LENGTH_SHORT).show();
+            return "";
+        }
         candidates.clear();
-        if ((!stroke.isEmpty()) && (((Collection) definitions.prefixMatch(stroke)).size() > 1)) {
+        if (stroke.isEmpty()) return null;
+        if ((((Collection) definitions.prefixMatch(stroke)).size() > 1)) {
             generateCandidates(stroke);
             return "";
         }
-        if (stroke.isEmpty()) return "";
         return definitions.get(stroke);
     }
 
@@ -244,7 +249,7 @@ public class Dictionary {
         translation = history.pop();
         if (! strokeHistory.isEmpty()) {
             stroke = strokeHistory.pop();
-            while ((! strokeHistory.isEmpty()) && (! translation.equals(stroke)) && (! translation.equals(definitions.get(stroke)))) {
+            while ((! stroke.isEmpty()) && (! strokeHistory.isEmpty()) && (! translation.equals(stroke)) && (! translation.equals(definitions.get(stroke)))) {
                 stroke =  strokeHistory.pop() + "/" + stroke;
             }
         }
@@ -318,6 +323,7 @@ public class Dictionary {
         }
 
       protected void onPostExecute(Long result) {
+          loaded = true;
           Toast.makeText(context, "Dictionary Loaded", Toast.LENGTH_LONG).show();
       }
     }

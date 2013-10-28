@@ -24,6 +24,7 @@ public class StenoKeyboard extends InputMethodService {
     private Dictionary dictionary;
     private TouchLayer keyboardView;
     private LinearLayout candidatesView;
+    private Boolean debug = true;
 
     @Override
     public void onCreate() {
@@ -49,6 +50,9 @@ public class StenoKeyboard extends InputMethodService {
                 String stroke = keyboardView.getStroke();
                 String message = dictionary.translate(stroke);
                 populateCandidates(dictionary.getCandidates());
+                if (debug) {
+                    Toast.makeText(getApplicationContext(), "sent: "+message, Toast.LENGTH_SHORT).show();
+                }
                 sendText(message);
             }
         });

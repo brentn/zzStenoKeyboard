@@ -5,6 +5,7 @@ import android.test.AndroidTestCase;
 import android.test.AndroidTestRunner;
 import android.test.IsolatedContext;
 
+import com.brentandjody.stenokeyboard.Definition;
 import com.brentandjody.stenokeyboard.Dictionary;
 
 import junit.framework.TestCase;
@@ -17,6 +18,9 @@ public class TestDictionary extends AndroidTestCase {
 
     protected void setUp() {
         dictionary = new Dictionary(getContext());
+        while (! dictionary.isLoaded()) {
+            System.out.print(".");
+        }
     }
 
     protected void tearDown() {
@@ -125,10 +129,10 @@ public class TestDictionary extends AndroidTestCase {
 
     public void testCandidates() {
         dictionary.lookup("A/ABT");
-        List<String> candidates = dictionary.getCandidateStrings();
+        List<Definition> candidates = dictionary.getCandidates();
         assertEquals(candidates.size(), 2);
-        assertTrue(candidates.contains("attribute"));
-        assertTrue(candidates.contains("attributing"));
+        assertEquals(candidates.get(0).getTranslation(),"attribute");
+        assertEquals(candidates.get(1).getTranslation(),"attributing");
     }
 
 }
