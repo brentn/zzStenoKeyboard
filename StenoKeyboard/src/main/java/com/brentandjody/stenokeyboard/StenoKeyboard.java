@@ -51,7 +51,7 @@ public class StenoKeyboard extends InputMethodService {
                 String message = dictionary.translate(stroke);
                 populateCandidates(dictionary.getCandidates());
                 if (debug) {
-                    Toast.makeText(getApplicationContext(), "sent: "+message, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "sent: "+stroke, Toast.LENGTH_SHORT).show();
                 }
                 sendText(message);
             }

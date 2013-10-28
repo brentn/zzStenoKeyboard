@@ -58,13 +58,7 @@ public class Dictionary {
             Toast.makeText(context, "Dictionary not yet loaded...", Toast.LENGTH_SHORT).show();
             return "";
         }
-        candidates.clear();
         if (stroke.isEmpty()) return null;
-        // if this translation *could* be unfinished, get possible candidates, and return ""
-        if ((((Collection) definitions.prefixMatch(stroke+"/")).size() > 0)) {
-            generateCandidates(stroke);
-            return "";
-        }
         return definitions.get(stroke);
     }
 
@@ -74,6 +68,7 @@ public class Dictionary {
 
         String translation;
         String result = "";
+        candidates.clear();
         // handle multi-stroke input recursively
         if (stroke.contains("/")) {
             for (String subStroke : stroke.split("/")) {
@@ -92,8 +87,13 @@ public class Dictionary {
             if (strokeQ.isEmpty()) {
                 return undoFromHistory();
             } else {
-                // pop the stroke queue
+                // pop the stroke queue twice, and replay the last stroke
                 strokeQ.removeLast();
+                stroke = strokesInQueue();
+                // if this translation *could* be unfinished, get possible candidates, and return ""
+                if ((((Collection) definitions.prefixMatch(stroke+"/")).size() > 0)) {
+                    generateCandidates(stroke);
+                }
                 return "";
             }
         }
@@ -106,6 +106,10 @@ public class Dictionary {
             }
             if (translation.isEmpty()) { // ambiguous
                 strokeQ.add(stroke);
+                // if this translation *could* be unfinished, get possible candidates, and return ""
+                if ((((Collection) definitions.prefixMatch(stroke+"/")).size() > 0)) {
+                    generateCandidates(stroke);
+                }
                 return "";
             }
             // deterministic
@@ -127,6 +131,10 @@ public class Dictionary {
             }
             if (translation.isEmpty()) { // ambiguous
                 strokeQ.add(stroke);
+                // if this translation *could* be unfinished, get possible candidates, and return ""
+                if ((((Collection) definitions.prefixMatch(stroke+"/")).size() > 0)) {
+                    generateCandidates(stroke);
+                }
                 return "";
             }
             // deterministic
@@ -149,7 +157,7 @@ public class Dictionary {
         Definition candidate;
         candidates.clear();
         // add the translation for the base stroke
-        candidate = new Definition(stroke,(definitions.get(stroke)));
+        candidate = new Definition(stroke,(decode(definitions.get(stroke))));
         candidates.add(candidate);
         // add translations that begin with this stroke
         for (String candidateStroke : definitions.prefixMatch(stroke+"/")) {
@@ -169,6 +177,7 @@ public class Dictionary {
     }
 
     private String decode(String input) {
+        if (input.isEmpty()) return "";
         if (capitalizeNextWord) {
             input = input.substring(0,1).toUpperCase() + input.substring(1);
         }

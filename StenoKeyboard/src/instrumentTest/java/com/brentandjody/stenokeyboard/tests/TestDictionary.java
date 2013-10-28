@@ -122,6 +122,11 @@ public class TestDictionary extends AndroidTestCase {
         assertEquals(dictionary.translate("TOGT/TK-LS/TOGT"), "togethertogether ");
     }
 
+    public void testNumbers() {
+        assertEquals(dictionary.translate("#THO"), "240");
+        assertEquals(dictionary.translate("#AZ"), "500");
+    }
+
     public void testCapitalize() {
         assertEquals(dictionary.translate("KPA*/TOEPBS"), "\bTones ");
         assertEquals(dictionary.translate("KPA"),"");
@@ -132,8 +137,8 @@ public class TestDictionary extends AndroidTestCase {
         dictionary.lookup("A/ABT");
         List<Definition> candidates = dictionary.getCandidates();
         assertEquals(candidates.size(), 2);
-        assertEquals(candidates.get(0).getTranslation(),"attribute");
-        assertEquals(candidates.get(1).getTranslation(),"attributing");
+        assertEquals(candidates.get(0).getTranslation(),"attribute ");
+        assertEquals(candidates.get(1).getTranslation(),"attributing ");
     }
 
 }

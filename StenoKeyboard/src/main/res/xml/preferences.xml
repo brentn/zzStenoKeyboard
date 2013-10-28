@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+
+    <PreferenceCategory
+        android:title="@string/dictionary"
+        android:key="pref_key_dictionary_settings">
+
+        <Preference
+            android:title="@string/personal_dictionary"
+            android:key="pref_key_personal_dictionary"/>
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

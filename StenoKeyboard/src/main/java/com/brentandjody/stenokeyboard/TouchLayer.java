@@ -45,7 +45,7 @@ public class TouchLayer extends RelativeLayout {
     private List<Button> keys = new ArrayList<Button>();
     private Path[] paths = new Path[NUM_PATHS];
     private Button sendKey;
-    private Button fKey;
+    private Button numberKey;
 
 
 
@@ -105,7 +105,7 @@ public class TouchLayer extends RelativeLayout {
 
     private void enumerateKeys(View v) {
         //list steno keys IN ORDER
-        fKey = (Button) v.findViewById(R.id._F);
+        numberKey = (Button) v.findViewById(R.id.number_bar);
         sendKey = (Button) v.findViewById(R.id.send_button);
         keys.add((Button) v.findViewById(R.id.number_bar));
         keys.add((Button) v.findViewById(R.id.S));
@@ -165,8 +165,13 @@ public class TouchLayer extends RelativeLayout {
                 break;
             }
             case MotionEvent.ACTION_UP: {
-                sendKey.setSelected(false);
                 i = event.getActionIndex();
+                List<Button> peek = peekKeys();
+                // a tap of the * button alone will autosend delete stroke
+                if (i == 0 && peek.size() == 1 && peek.get(0).getHint().equals("*")) {
+                    onStrokeCompleteListener.onStrokeComplete();
+                }
+                sendKey.setSelected(false);
                 paths[i].reset();
                 break;
             }
@@ -229,6 +234,16 @@ public class TouchLayer extends RelativeLayout {
         return true;
     }
 
+    private List<Button> peekKeys() {
+        List<Button> result = new ArrayList<Button>();
+        for (Button key : keys) {
+            if (key.isSelected()) {
+                result.add(key);
+            }
+        }
+        return result;
+    }
+
     public String getStroke() {
         String result = "";
         List<String> chord = new ArrayList<String>();
@@ -238,7 +253,7 @@ public class TouchLayer extends RelativeLayout {
                 key.setSelected(false);
             }
         }
-        if (chord.contains("#")) {
+        if (numberKey.isSelected()) {
             chord = convertNumbers(chord);
         }
         result = constructStroke(chord);
@@ -257,7 +272,7 @@ public class TouchLayer extends RelativeLayout {
             i++;
         }
         if (numeral) {
-            chord.remove("#");
+            numberKey.setSelected(false);
         }
         return chord;
 
