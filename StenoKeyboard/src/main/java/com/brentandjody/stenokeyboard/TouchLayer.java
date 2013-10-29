@@ -1,11 +1,13 @@
 package com.brentandjody.stenokeyboard;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Point;
+import android.preference.PreferenceManager;
 import android.util.AttributeSet;
 import android.view.Display;
 import android.view.MotionEvent;
@@ -13,6 +15,8 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import java.util.ArrayList;
@@ -46,25 +50,33 @@ public class TouchLayer extends RelativeLayout {
     private Path[] paths = new Path[NUM_PATHS];
     private Button sendKey;
     private Button numberKey;
+    private Context context;
+    private Boolean expandVowelKeys = false;
 
 
 
     public TouchLayer(Context context) {
         super(context);
+        this.context = context;
         init();
     }
 
     public TouchLayer(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
+        this.context = context;
         init();
     }
 
     public TouchLayer(Context context, AttributeSet attrs) {
         super(context, attrs);
+        this.context = context;
         init();
     }
 
+
     private void init() {
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+        expandVowelKeys = sharedPrefs.getBoolean("pref_key_expand_vowel_keys", true);
         PAINT.setColor(getResources().getColor(android.R.color.holo_blue_bright));
         PAINT.setAntiAlias(true);
         PAINT.setDither(true);
@@ -74,7 +86,7 @@ public class TouchLayer extends RelativeLayout {
         PAINT.setStrokeWidth(12);
     }
 
-            @Override
+    @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         for (int i=0; i<NUM_PATHS; i++) {
@@ -101,6 +113,29 @@ public class TouchLayer extends RelativeLayout {
         int keyboard_height = screen_height / 3;
         if (keyboard_height < MIN_KBD_HEIGHT) keyboard_height = MIN_KBD_HEIGHT;
         this.getLayoutParams().height = keyboard_height;
+        if (changed) {
+            LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) this.findViewById(R.id.A).getLayoutParams();
+            if (expandVowelKeys) {
+                layoutParams.setMargins(2,-25,2,0);
+                this.findViewById(R.id.A).setLayoutParams(layoutParams);
+                this.findViewById(R.id._U).setLayoutParams(layoutParams);
+                layoutParams.setMargins(2,-40,2,0);
+                this.findViewById(R.id.O).setLayoutParams(layoutParams);
+                this.findViewById(R.id._E).setLayoutParams(layoutParams);
+                layoutParams.setMargins(2,0,2,25);
+                this.findViewById(R.id.number_bar).setLayoutParams(layoutParams);
+                this.findViewById(R.id.star).setLayoutParams(layoutParams);
+            } else {
+                layoutParams.setMargins(2,0,2,0);
+                this.findViewById(R.id.A).setLayoutParams(layoutParams);
+                this.findViewById(R.id.O).setLayoutParams(layoutParams);
+                this.findViewById(R.id._E).setLayoutParams(layoutParams);
+                this.findViewById(R.id._U).setLayoutParams(layoutParams);
+                layoutParams.setMargins(2,0,2,0);
+                this.findViewById(R.id.number_bar).setLayoutParams(layoutParams);
+                this.findViewById(R.id.star).setLayoutParams(layoutParams);
+            }
+        }
     }
 
     private void enumerateKeys(View v) {

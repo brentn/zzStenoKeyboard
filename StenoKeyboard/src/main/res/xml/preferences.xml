@@ -13,4 +13,14 @@
 
     </PreferenceCategory>
 
+    <PreferenceCategory
+        android:title="Layout"
+        android:key="pref_key_layout_settings">
+
+        <SwitchPreference
+            android:title="Expand vowel keys"
+            android:key="pref_key_expand_vowel_keys"/>
+
+    </PreferenceCategory>
+
 </PreferenceScreen>
