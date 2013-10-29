@@ -36,6 +36,7 @@ public class Dictionary {
     private History history = new History();
     private History strokeHistory = new History();
     private Boolean capitalizeNextWord = false;
+    private Boolean hasGlue = false;
     private Context context;
 
     public Dictionary(Context c) {
@@ -150,6 +151,7 @@ public class Dictionary {
     private void generateCandidates(String stroke) {
         candidates.clear();
         Boolean cnw = capitalizeNextWord;
+        Boolean hg = hasGlue;
         if ((((Collection) definitions.prefixMatch(stroke+"/")).size() > 0)) {
             Definition candidate;
             // add the translation for the base stroke
@@ -169,6 +171,7 @@ public class Dictionary {
             }
         }
         capitalizeNextWord=cnw;
+        hasGlue = hg;
     }
 
     private String strokesInQueue() {
@@ -194,6 +197,15 @@ public class Dictionary {
         if (! input.contains("{")) return input+" ";
         //handle glue
         String output = input + " ";
+        if (output.contains("{&")) {
+            if (hasGlue) { // if the last stroke also had glue
+                output = "\b"+output;
+            }
+            hasGlue = true;
+            output = output.replace("{&","");
+        } else {
+            hasGlue = false;
+        }
         // start glue
         if (output.substring(0,2).equals("{^")) {
             output = "\b" + output.replace("{^","");

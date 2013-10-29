@@ -120,6 +120,8 @@ public class TestDictionary extends AndroidTestCase {
         assertEquals(dictionary.translate("*ERBGS/A/KROS"), "extraacross ");
         // both glue
         assertEquals(dictionary.translate("TOGT/TK-LS/TOGT"), "togethertogether ");
+        // sticky glue
+        assertEquals(dictionary.translate("A*/PW*/KR*/S-P"), "abc ");
     }
 
     public void testCapitalize() {
