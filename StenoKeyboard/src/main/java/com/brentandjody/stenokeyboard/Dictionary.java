@@ -28,6 +28,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class Dictionary {
 
     private static final String DICTFILE = "dict.json";
+    private static final int MAX_CANDIDATES = 20;
     private static TST<String> definitions = new TST<String>();
     private static Boolean loaded = false;
     private Deque<String> strokeQ = new LinkedBlockingDeque<String>();
@@ -59,7 +60,10 @@ public class Dictionary {
             return "";
         }
         if (stroke.isEmpty()) return null;
-        return definitions.get(stroke);
+        if (((Collection) definitions.prefixMatch(stroke+"/")).size() > 0) {
+            return ""; //ambiguous
+        }
+        return definitions.get(stroke); //if exists
     }
 
     public String translate(String stroke) {
@@ -68,7 +72,6 @@ public class Dictionary {
 
         String translation;
         String result = "";
-        candidates.clear();
         // handle multi-stroke input recursively
         if (stroke.contains("/")) {
             for (String subStroke : stroke.split("/")) {
@@ -82,6 +85,7 @@ public class Dictionary {
             return result;
         }
 
+        candidates.clear();
         // handle undo first
         if (stroke.equals("*")) {
             if (strokeQ.isEmpty()) {
@@ -90,10 +94,7 @@ public class Dictionary {
                 // pop the stroke queue twice, and replay the last stroke
                 strokeQ.removeLast();
                 stroke = strokesInQueue();
-                // if this translation *could* be unfinished, get possible candidates, and return ""
-                if ((((Collection) definitions.prefixMatch(stroke+"/")).size() > 0)) {
-                    generateCandidates(stroke);
-                }
+                generateCandidates(stroke);
                 return "";
             }
         }
@@ -106,10 +107,7 @@ public class Dictionary {
             }
             if (translation.isEmpty()) { // ambiguous
                 strokeQ.add(stroke);
-                // if this translation *could* be unfinished, get possible candidates, and return ""
-                if ((((Collection) definitions.prefixMatch(stroke+"/")).size() > 0)) {
-                    generateCandidates(stroke);
-                }
+                generateCandidates(strokesInQueue());
                 return "";
             }
             // deterministic
@@ -124,17 +122,14 @@ public class Dictionary {
                 if (qString.isEmpty()) translation=null;
                 else translation = definitions.get(qString);
                 if (translation == null) {
-                    translation = qString.replace("/"," ");
+                    translation = qString;
                 }
                 updateHistory(strokeQ, translation);
-                return decode(translation) + translate(stroke);
+                return decode(translation) + decode(translate(stroke));
             }
             if (translation.isEmpty()) { // ambiguous
                 strokeQ.add(stroke);
-                // if this translation *could* be unfinished, get possible candidates, and return ""
-                if ((((Collection) definitions.prefixMatch(stroke+"/")).size() > 0)) {
-                    generateCandidates(stroke);
-                }
+                generateCandidates(strokesInQueue());
                 return "";
             }
             // deterministic
@@ -145,7 +140,6 @@ public class Dictionary {
     }
 
     public void addPhraseToHistory(String phrase) {
-
         updateHistory(strokeQ, phrase);
     }
 
@@ -154,16 +148,27 @@ public class Dictionary {
     }
 
     private void generateCandidates(String stroke) {
-        Definition candidate;
         candidates.clear();
-        // add the translation for the base stroke
-        candidate = new Definition(stroke,(decode(definitions.get(stroke))));
-        candidates.add(candidate);
-        // add translations that begin with this stroke
-        for (String candidateStroke : definitions.prefixMatch(stroke+"/")) {
-            candidate = new Definition(candidateStroke, definitions.get(candidateStroke));
-            candidates.add(candidate);
+        Boolean cnw = capitalizeNextWord;
+        if ((((Collection) definitions.prefixMatch(stroke+"/")).size() > 0)) {
+            Definition candidate;
+            // add the translation for the base stroke
+            String translation = definitions.get(stroke);
+            // add this stroke (if it's a word)
+            if (translation != null) {
+                candidate = new Definition(stroke,(decode(translation)));
+                candidates.add(candidate);
+            }
+            // add translations that begin with this stroke
+            for (String candidateStroke : definitions.prefixMatch(stroke+"/")) {
+                candidate = new Definition(candidateStroke, decode(definitions.get(candidateStroke)));
+                candidates.add(candidate);
+                if (candidates.size() >= MAX_CANDIDATES) {
+                    break;
+                }
+            }
         }
+        capitalizeNextWord=cnw;
     }
 
     private String strokesInQueue() {
@@ -177,30 +182,33 @@ public class Dictionary {
     }
 
     private String decode(String input) {
+        // decode special dictionary codes
+        // add space if not overridden
         if (input.isEmpty()) return "";
+        input = input.trim();
         if (capitalizeNextWord) {
             input = input.substring(0,1).toUpperCase() + input.substring(1);
+            capitalizeNextWord = false;
         }
-        capitalizeNextWord = false;
         // short circuit if no special characters
         if (! input.contains("{")) return input+" ";
         //handle glue
         String output = input + " ";
         // start glue
-        if (input.substring(0,2).equals("{^")) {
+        if (output.substring(0,2).equals("{^")) {
             output = "\b" + output.replace("{^","");
         }
         // end glue
-        int pos = input.indexOf("^}");
+        int pos = output.indexOf("^}");
         if (pos >= 0) {
             output = output.replace("^}","");
-            output = output.substring(0, output.length()-1);
+            output = output.replaceAll("\\s+$", ""); //trim space at end
         }
         // capitalization
-        pos = input.indexOf("{-|}");
-        if (pos > 0) {
+        pos = output.indexOf("{-|}");
+        if (pos >= 0) {
             capitalizeNextWord = true;
-            output = output.replace("{-|}","");
+            output = output.replace("{-|}","").replaceAll("\\s+$", ""); //trim space at end
         }
         output = output.replace("{","").replace("}","");
         return output;

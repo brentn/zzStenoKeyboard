@@ -84,8 +84,8 @@ public class TestDictionary extends AndroidTestCase {
         assertEquals(dictionary.translate("KWREU"), "");
         assertEquals(dictionary.translate("TAEULS"), "fairy tails ");
         //phrase
-        assertEquals(dictionary.translate("SPEUPB/A/ROUPBD/RAODZ"), "spin around roads ");
-        assertEquals(dictionary.translate("KPA/WHA/TKO/U/THEU/-G"), "  What do you thinking ");
+        assertEquals(dictionary.translate("SPEUPB/A/ROUPBD/RAODZ/-PLT"), "spin around roads . ");
+        assertEquals(dictionary.translate("KPA*/WHA/WR/U/THEU/-G/KW-PL"), "\bWhat were you thinking ? ");
     }
 
     public void testUndo() {
@@ -122,19 +122,14 @@ public class TestDictionary extends AndroidTestCase {
         assertEquals(dictionary.translate("TOGT/TK-LS/TOGT"), "togethertogether ");
     }
 
-    public void testNumbers() {
-        assertEquals(dictionary.translate("#THO"), "240");
-        assertEquals(dictionary.translate("#AZ"), "500");
-    }
-
     public void testCapitalize() {
         assertEquals(dictionary.translate("KPA*/TOEPBS"), "\bTones ");
         assertEquals(dictionary.translate("KPA"),"");
-        assertEquals(dictionary.translate("TOEPBS"), "  Tones ");
+        assertEquals(dictionary.translate("TOEPBS"), " Tones ");
     }
 
     public void testCandidates() {
-        dictionary.lookup("A/ABT");
+        assertEquals(dictionary.translate("A/ABT"),"");
         List<Definition> candidates = dictionary.getCandidates();
         assertEquals(candidates.size(), 2);
         assertEquals(candidates.get(0).getTranslation(),"attribute ");
