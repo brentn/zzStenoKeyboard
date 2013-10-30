@@ -1,12 +1,10 @@
 package com.brentandjody.stenokeyboard;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Point;
-import android.preference.PreferenceManager;
 import android.util.AttributeSet;
 import android.view.Display;
 import android.view.MotionEvent;
@@ -22,9 +20,6 @@ import java.util.Collections;
 import java.util.Hashtable;
 import java.util.List;
 
-/**
- * Created by brent on 20/10/13.
- */
 public class TouchLayer extends LinearLayout {
 
     private static final Hashtable<String,String> NUMBER_KEYS = new Hashtable<String, String>() {{
@@ -39,17 +34,15 @@ public class TouchLayer extends LinearLayout {
         put("-L", "-8");
         put("-T", "-9");
     }};
-    private static final int TOUCH_RADIUS = 2;
     private static final int NUM_PATHS = 2;
     private static final int MIN_KBD_HEIGHT = 400;
     private static Paint PAINT = new Paint();
     private List<Button> keys = new ArrayList<Button>();
     private Path[] paths = new Path[NUM_PATHS];
     private Button sendKey;
-    private Button numberKey;
     private Context context;
     private Boolean expandVowelKeys = false;
-    private Boolean autoSend = false;
+    private Boolean autoSend = true;
 
 
 
@@ -84,9 +77,9 @@ public class TouchLayer extends LinearLayout {
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
-        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
-        expandVowelKeys = sharedPrefs.getBoolean("pref_key_expand_vowel_keys", true);
-        autoSend = ! sharedPrefs.getBoolean("pref_key_send_button", false);
+//        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+//        expandVowelKeys = sharedPrefs.getBoolean("pref_key_expand_vowel_keys", true);
+//        autoSend = ! sharedPrefs.getBoolean("pref_key_send_button", false);
         if (autoSend) {
             ((LinearLayout) this.findViewById(R.id.send_button).getParent()).setVisibility(GONE);
         } else {
@@ -147,7 +140,6 @@ public class TouchLayer extends LinearLayout {
 
     private void enumerateKeys(View v) {
         //list steno keys IN ORDER
-        numberKey = (Button) v.findViewById(R.id.number_bar);
         keys.add((Button) v.findViewById(R.id.number_bar));
         keys.add((Button) v.findViewById(R.id.S));
         keys.add((Button) v.findViewById(R.id.T));
@@ -200,7 +192,6 @@ public class TouchLayer extends LinearLayout {
                 break;
             }
             case MotionEvent.ACTION_MOVE: {
-                i = event.getActionIndex();
                 selectKeys(event);
                 invalidate();
                 break;
@@ -209,7 +200,7 @@ public class TouchLayer extends LinearLayout {
                 i = event.getActionIndex();
                 if (autoSend) {
                     if (i == 0) {
-                        onStrokeCompleteListener.onStrokeComplete();;
+                        onStrokeCompleteListener.onStrokeComplete();
                     }
                 } else {
                     List<Button> peek = peekKeys();
@@ -273,13 +264,11 @@ public class TouchLayer extends LinearLayout {
     }
 
     private Boolean pointerOnKey(Point p, View key) {
-        Point topLeft = new Point();
         Point bottomRight = new Point();
-        topLeft = getScreenOffset(key);
+        Point topLeft = getScreenOffset(key);
         bottomRight.set(topLeft.x+key.getWidth(),
                 topLeft.y+key.getHeight());
-        if ((p.x < topLeft.x) || (p.x > bottomRight.x)) return false;
-        if ((p.y < topLeft.y) || (p.y > bottomRight.y)) return false;
+        if ((p.x < topLeft.x) || (p.x > bottomRight.x) || (p.y < topLeft.y) || (p.y > bottomRight.y)) return false;
         return true;
     }
 
@@ -336,7 +325,7 @@ public class TouchLayer extends LinearLayout {
             }
         } else {
             for (String key : chord) {
-                if (key == "#" || key.charAt(key.length()-1) == '-') {
+                if (key.equals("#") || key.charAt(key.length()-1) == '-') {
                     result += key.replace("-", "");
                 }
                 if (key.charAt(0) == '-') {
@@ -348,16 +337,6 @@ public class TouchLayer extends LinearLayout {
             }
         }
         return result;
-    }
-
-    // For Testing
-    public Button getKey(String label) {
-        for (Button key : keys) {
-            if (key.getHint().toString().equals(label)) {
-                return key;
-            }
-        }
-        return null;
     }
 
 }

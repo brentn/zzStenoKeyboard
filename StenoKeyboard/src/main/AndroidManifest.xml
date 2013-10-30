@@ -6,7 +6,6 @@
     <uses-sdk android:minSdkVersion="14" android:targetSdkVersion="18" />
 
     <application android:allowBackup="true"
-        android:name="com.brentandjody.stenokeyboard.SKApplication"
         android:label="@string/app_name"
         android:icon="@drawable/ic_launcher"
         android:theme="@style/AppTheme">
