@@ -41,7 +41,7 @@ public class TouchLayer extends LinearLayout {
     private Path[] paths = new Path[NUM_PATHS];
     private Button sendKey;
     private Context context;
-    private Boolean expandVowelKeys = false;
+    private Boolean expandVowelKeys = true;
     private Boolean autoSend = true;
 
 
@@ -88,24 +88,17 @@ public class TouchLayer extends LinearLayout {
         }
         LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) this.findViewById(R.id.A).getLayoutParams();
         if (expandVowelKeys) {
-            layoutParams.setMargins(2,-25,2,0);
+            layoutParams.weight=1.1f;
             this.findViewById(R.id.A).setLayoutParams(layoutParams);
             this.findViewById(R.id._U).setLayoutParams(layoutParams);
-            layoutParams.setMargins(2,-40,2,0);
             this.findViewById(R.id.O).setLayoutParams(layoutParams);
             this.findViewById(R.id._E).setLayoutParams(layoutParams);
-            layoutParams.setMargins(2,0,2,25);
-            this.findViewById(R.id.number_bar).setLayoutParams(layoutParams);
-            this.findViewById(R.id.star).setLayoutParams(layoutParams);
         } else {
-            layoutParams.setMargins(2,0,2,0);
+            layoutParams.weight=1f;
             this.findViewById(R.id.A).setLayoutParams(layoutParams);
             this.findViewById(R.id.O).setLayoutParams(layoutParams);
             this.findViewById(R.id._E).setLayoutParams(layoutParams);
             this.findViewById(R.id._U).setLayoutParams(layoutParams);
-            layoutParams.setMargins(2,0,2,0);
-            this.findViewById(R.id.number_bar).setLayoutParams(layoutParams);
-            this.findViewById(R.id.star).setLayoutParams(layoutParams);
         }
     }
 

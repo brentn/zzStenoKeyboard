@@ -265,7 +265,7 @@
             <Button
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
-                android:layout_weight="@integer/key_weight"
+                android:layout_weight="1"
                 android:text="E"
                 android:id="@+id/_E"
                 android:layout_centerInParent="true"
