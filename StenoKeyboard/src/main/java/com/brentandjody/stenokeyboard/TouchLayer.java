@@ -3,7 +3,6 @@ package com.brentandjody.stenokeyboard;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Point;
@@ -15,9 +14,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 
-import android.widget.FrameLayout;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,7 +25,7 @@ import java.util.List;
 /**
  * Created by brent on 20/10/13.
  */
-public class TouchLayer extends RelativeLayout {
+public class TouchLayer extends LinearLayout {
 
     private static final Hashtable<String,String> NUMBER_KEYS = new Hashtable<String, String>() {{
         put("S-", "1-");
@@ -52,6 +49,7 @@ public class TouchLayer extends RelativeLayout {
     private Button numberKey;
     private Context context;
     private Boolean expandVowelKeys = false;
+    private Boolean autoSend = false;
 
 
 
@@ -73,10 +71,7 @@ public class TouchLayer extends RelativeLayout {
         init();
     }
 
-
     private void init() {
-        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
-        expandVowelKeys = sharedPrefs.getBoolean("pref_key_expand_vowel_keys", true);
         PAINT.setColor(getResources().getColor(android.R.color.holo_blue_bright));
         PAINT.setAntiAlias(true);
         PAINT.setDither(true);
@@ -84,6 +79,41 @@ public class TouchLayer extends RelativeLayout {
         PAINT.setStrokeJoin(Paint.Join.ROUND);
         PAINT.setStrokeCap(Paint.Cap.ROUND);
         PAINT.setStrokeWidth(12);
+    }
+
+    @Override
+    protected void onFinishInflate() {
+        super.onFinishInflate();
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+        expandVowelKeys = sharedPrefs.getBoolean("pref_key_expand_vowel_keys", true);
+        autoSend = ! sharedPrefs.getBoolean("pref_key_send_button", false);
+        if (autoSend) {
+            ((LinearLayout) this.findViewById(R.id.send_button).getParent()).setVisibility(GONE);
+        } else {
+            ((LinearLayout) this.findViewById(R.id.send_button).getParent()).setVisibility(VISIBLE);
+            sendKey = (Button) this.findViewById(R.id.send_button);
+        }
+        LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) this.findViewById(R.id.A).getLayoutParams();
+        if (expandVowelKeys) {
+            layoutParams.setMargins(2,-25,2,0);
+            this.findViewById(R.id.A).setLayoutParams(layoutParams);
+            this.findViewById(R.id._U).setLayoutParams(layoutParams);
+            layoutParams.setMargins(2,-40,2,0);
+            this.findViewById(R.id.O).setLayoutParams(layoutParams);
+            this.findViewById(R.id._E).setLayoutParams(layoutParams);
+            layoutParams.setMargins(2,0,2,25);
+            this.findViewById(R.id.number_bar).setLayoutParams(layoutParams);
+            this.findViewById(R.id.star).setLayoutParams(layoutParams);
+        } else {
+            layoutParams.setMargins(2,0,2,0);
+            this.findViewById(R.id.A).setLayoutParams(layoutParams);
+            this.findViewById(R.id.O).setLayoutParams(layoutParams);
+            this.findViewById(R.id._E).setLayoutParams(layoutParams);
+            this.findViewById(R.id._U).setLayoutParams(layoutParams);
+            layoutParams.setMargins(2,0,2,0);
+            this.findViewById(R.id.number_bar).setLayoutParams(layoutParams);
+            this.findViewById(R.id.star).setLayoutParams(layoutParams);
+        }
     }
 
     @Override
@@ -113,35 +143,11 @@ public class TouchLayer extends RelativeLayout {
         int keyboard_height = screen_height / 3;
         if (keyboard_height < MIN_KBD_HEIGHT) keyboard_height = MIN_KBD_HEIGHT;
         this.getLayoutParams().height = keyboard_height;
-        if (changed) {
-            LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) this.findViewById(R.id.A).getLayoutParams();
-            if (expandVowelKeys) {
-                layoutParams.setMargins(2,-25,2,0);
-                this.findViewById(R.id.A).setLayoutParams(layoutParams);
-                this.findViewById(R.id._U).setLayoutParams(layoutParams);
-                layoutParams.setMargins(2,-40,2,0);
-                this.findViewById(R.id.O).setLayoutParams(layoutParams);
-                this.findViewById(R.id._E).setLayoutParams(layoutParams);
-                layoutParams.setMargins(2,0,2,25);
-                this.findViewById(R.id.number_bar).setLayoutParams(layoutParams);
-                this.findViewById(R.id.star).setLayoutParams(layoutParams);
-            } else {
-                layoutParams.setMargins(2,0,2,0);
-                this.findViewById(R.id.A).setLayoutParams(layoutParams);
-                this.findViewById(R.id.O).setLayoutParams(layoutParams);
-                this.findViewById(R.id._E).setLayoutParams(layoutParams);
-                this.findViewById(R.id._U).setLayoutParams(layoutParams);
-                layoutParams.setMargins(2,0,2,0);
-                this.findViewById(R.id.number_bar).setLayoutParams(layoutParams);
-                this.findViewById(R.id.star).setLayoutParams(layoutParams);
-            }
-        }
     }
 
     private void enumerateKeys(View v) {
         //list steno keys IN ORDER
         numberKey = (Button) v.findViewById(R.id.number_bar);
-        sendKey = (Button) v.findViewById(R.id.send_button);
         keys.add((Button) v.findViewById(R.id.number_bar));
         keys.add((Button) v.findViewById(R.id.S));
         keys.add((Button) v.findViewById(R.id.T));
@@ -201,12 +207,18 @@ public class TouchLayer extends RelativeLayout {
             }
             case MotionEvent.ACTION_UP: {
                 i = event.getActionIndex();
-                List<Button> peek = peekKeys();
-                // a tap of the * button alone will autosend delete stroke
-                if (i == 0 && peek.size() == 1 && peek.get(0).getHint().equals("*")) {
-                    onStrokeCompleteListener.onStrokeComplete();
+                if (autoSend) {
+                    if (i == 0) {
+                        onStrokeCompleteListener.onStrokeComplete();;
+                    }
+                } else {
+                    List<Button> peek = peekKeys();
+                    // a tap of the * button alone will autosend delete stroke
+                    if (i == 0 && peek.size() == 1 && peek.get(0).getHint().equals("*")) {
+                        onStrokeCompleteListener.onStrokeComplete();
+                    }
+                    sendKey.setSelected(false);
                 }
-                sendKey.setSelected(false);
                 paths[i].reset();
                 break;
             }
@@ -218,7 +230,7 @@ public class TouchLayer extends RelativeLayout {
         Point pointer = new Point();
         Point offset = getScreenOffset(this);
         pointer.set((int)x+offset.x, (int)y+offset.y);
-        if (pointerOnKey(pointer, sendKey)) {
+        if ((!autoSend) && pointerOnKey(pointer, sendKey)) {
             sendKey.setSelected(true);
             onStrokeCompleteListener.onStrokeComplete();
             return;
@@ -238,9 +250,11 @@ public class TouchLayer extends RelativeLayout {
         for (int n=0; n<e.getHistorySize(); n++) {
             pointer.set((int)e.getHistoricalX(i, n)+offset.x, (int)e.getHistoricalY(i, n)+offset.y);
             paths[i].lineTo(e.getHistoricalX(i, n), e.getHistoricalY(i, n));
-            if ((!sendKey.isSelected()) && pointerOnKey(pointer, sendKey)) {
-                sendKey.setSelected(true);
-                onStrokeCompleteListener.onStrokeComplete();
+            if (! autoSend) {
+                if ((!sendKey.isSelected()) && pointerOnKey(pointer, sendKey)) {
+                    sendKey.setSelected(true);
+                    onStrokeCompleteListener.onStrokeComplete();
+                }
             }
             for (Button key : keys) {
                 if (pointerOnKey(pointer, key)) {

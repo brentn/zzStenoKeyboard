@@ -1,5 +1,6 @@
 package com.brentandjody.stenokeyboard;
 
+import android.content.Intent;
 import android.inputmethodservice.InputMethodService;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -58,6 +59,16 @@ public class StenoKeyboard extends InputMethodService {
                 } else {
                     Toast.makeText(getApplicationContext(), "Dictionary not yet loaded", Toast.LENGTH_SHORT).show();
                 }
+            }
+        });
+        Button settingsButton = (Button) keyboardView.findViewById(R.id.settings_button);
+        settingsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(), SettingsActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
             }
         });
         return keyboardView;

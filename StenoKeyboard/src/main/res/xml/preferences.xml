@@ -19,7 +19,13 @@
 
         <SwitchPreference
             android:title="Expand vowel keys"
-            android:key="pref_key_expand_vowel_keys"/>
+            android:key="pref_key_expand_vowel_keys"
+            android:defaultValue="false" />
+
+        <SwitchPreference
+            android:title="SEND button"
+            android:key="pref_key_send_button"
+            android:defaultValue="true" />
 
     </PreferenceCategory>
 

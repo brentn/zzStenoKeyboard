@@ -178,7 +178,6 @@
                 android:background="@drawable/numberbar"
                 android:clickable="false"
                 android:layout_weight="1"
-                android:layout_marginBottom="25dp"
                 android:layout_marginLeft="2dp"
                 android:hint="#"
                 android:layout_marginRight="2dp" />
@@ -197,7 +196,6 @@
                 android:layout_centerInParent="true"
                 android:background="@drawable/vowelkey"
                 android:clickable="false"
-                android:layout_marginTop="-25dp"
                 android:layout_marginRight="2dp"
                 android:layout_marginLeft="2dp"
                 android:hint="A-" />
@@ -210,12 +208,20 @@
             android:layout_height="match_parent"
             android:minHeight="100dp"
             android:layout_weight="@integer/key_weight"
-            android:id="@+id/linearLayout11" >
+            android:id="@+id/linearLayout11">
 
-            <FrameLayout
+            <Button
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
-                android:layout_weight="1" />
+                android:layout_weight="1"
+                android:layout_marginBottom="40dp"
+                android:layout_marginLeft="8dp"
+                android:background="@android:color/black"
+                android:id="@+id/settings_button"
+                android:text="..."
+                android:textColor="@android:color/white"
+                android:clickable="true"
+                android:singleLine="false" />
 
             <FrameLayout
                 android:layout_width="fill_parent"
@@ -231,7 +237,6 @@
                 android:layout_centerInParent="true"
                 android:background="@drawable/vowelkey"
                 android:clickable="false"
-                android:layout_marginTop="-40dp"
                 android:layout_marginLeft="2dp"
                 android:layout_marginRight="2dp"
                 android:hint="O-" />
@@ -266,7 +271,6 @@
                 android:layout_centerInParent="true"
                 android:background="@drawable/vowelkey"
                 android:clickable="false"
-                android:layout_marginTop="-40dp"
                 android:layout_marginLeft="2dp"
                 android:layout_marginRight="2dp"
                 android:hint="-E" />
@@ -289,7 +293,6 @@
                 android:clickable="false"
                 android:text="*"
                 android:layout_weight="1"
-                android:layout_marginBottom="25dp"
                 android:layout_marginRight="2dp"
                 android:hint="*"
                 android:layout_marginLeft="2dp" />
@@ -309,7 +312,6 @@
                 android:layout_centerInParent="true"
                 android:background="@drawable/vowelkey"
                 android:clickable="false"
-                android:layout_marginTop="-25dp"
                 android:layout_marginLeft="2dp"
                 android:layout_marginRight="2dp"
                 android:hint="-U" />
