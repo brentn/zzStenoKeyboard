@@ -17,10 +17,11 @@
         android:title="Layout"
         android:key="pref_key_layout_settings">
 
-        <SwitchPreference
-            android:title="Expand vowel keys"
-            android:key="pref_key_expand_vowel_keys"
-            android:defaultValue="false" />
+        <SeekBarPreference
+            android:title="Size of vowel keys"
+            android:key="pref_key_vowel_key_weight"
+            android:defaultValue="5"
+            android:max="10"/>
 
         <SwitchPreference
             android:title="SEND button"

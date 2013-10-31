@@ -1,10 +1,12 @@
 package com.brentandjody.stenokeyboard;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Point;
+import android.preference.PreferenceManager;
 import android.util.AttributeSet;
 import android.view.Display;
 import android.view.MotionEvent;
@@ -20,7 +22,7 @@ import java.util.Collections;
 import java.util.Hashtable;
 import java.util.List;
 
-public class TouchLayer extends LinearLayout {
+public class TouchLayer extends LinearLayout implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     private static final Hashtable<String,String> NUMBER_KEYS = new Hashtable<String, String>() {{
         put("S-", "1-");
@@ -37,13 +39,12 @@ public class TouchLayer extends LinearLayout {
     private static final int NUM_PATHS = 2;
     private static final int MIN_KBD_HEIGHT = 400;
     private static Paint PAINT = new Paint();
+    private SharedPreferences prefs;
     private List<Button> keys = new ArrayList<Button>();
     private Path[] paths = new Path[NUM_PATHS];
     private Button sendKey;
     private Context context;
-    private Boolean expandVowelKeys = true;
     private Boolean autoSend = true;
-
 
 
     public TouchLayer(Context context) {
@@ -65,6 +66,8 @@ public class TouchLayer extends LinearLayout {
     }
 
     private void init() {
+        prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        autoSend = ! prefs.getBoolean("pref_key_send_button", false);
         PAINT.setColor(getResources().getColor(android.R.color.holo_blue_bright));
         PAINT.setAntiAlias(true);
         PAINT.setDither(true);
@@ -77,29 +80,12 @@ public class TouchLayer extends LinearLayout {
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
-//        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
-//        expandVowelKeys = sharedPrefs.getBoolean("pref_key_expand_vowel_keys", true);
-//        autoSend = ! sharedPrefs.getBoolean("pref_key_send_button", false);
-        if (autoSend) {
-            ((LinearLayout) this.findViewById(R.id.send_button).getParent()).setVisibility(GONE);
-        } else {
-            ((LinearLayout) this.findViewById(R.id.send_button).getParent()).setVisibility(VISIBLE);
-            sendKey = (Button) this.findViewById(R.id.send_button);
-        }
-        LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) this.findViewById(R.id.A).getLayoutParams();
-        if (expandVowelKeys) {
-            layoutParams.weight=1.1f;
-            this.findViewById(R.id.A).setLayoutParams(layoutParams);
-            this.findViewById(R.id._U).setLayoutParams(layoutParams);
-            this.findViewById(R.id.O).setLayoutParams(layoutParams);
-            this.findViewById(R.id._E).setLayoutParams(layoutParams);
-        } else {
-            layoutParams.weight=1f;
-            this.findViewById(R.id.A).setLayoutParams(layoutParams);
-            this.findViewById(R.id.O).setLayoutParams(layoutParams);
-            this.findViewById(R.id._E).setLayoutParams(layoutParams);
-            this.findViewById(R.id._U).setLayoutParams(layoutParams);
-        }
+        customizeKeyLayout();
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
+        customizeKeyLayout();
     }
 
     @Override
@@ -158,7 +144,26 @@ public class TouchLayer extends LinearLayout {
         keys.add((Button) v.findViewById(R.id._Z));
     }
 
+    private void customizeKeyLayout() {
+        int weightSetting = prefs.getInt("pref_key_vowel_key_weight", 5);
+        float vowelKeyWeight = 1.25f - (weightSetting / 20f);
+        autoSend = ! prefs.getBoolean("pref_key_send_button", false);
+        if (autoSend) {
+            ((LinearLayout) this.findViewById(R.id.send_button).getParent()).setVisibility(GONE);
+        } else {
+            ((LinearLayout) this.findViewById(R.id.send_button).getParent()).setVisibility(VISIBLE);
+            sendKey = (Button) this.findViewById(R.id.send_button);
+        }
+        LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) this.findViewById(R.id.A).getLayoutParams();
+        layoutParams.weight=vowelKeyWeight;
+        this.findViewById(R.id.A).setLayoutParams(layoutParams);
+        this.findViewById(R.id._U).setLayoutParams(layoutParams);
+        this.findViewById(R.id.O).setLayoutParams(layoutParams);
+        this.findViewById(R.id._E).setLayoutParams(layoutParams);
+    }
+
     private OnStrokeCompleteListener onStrokeCompleteListener;
+
     public interface OnStrokeCompleteListener {
         public void onStrokeComplete();
     }
