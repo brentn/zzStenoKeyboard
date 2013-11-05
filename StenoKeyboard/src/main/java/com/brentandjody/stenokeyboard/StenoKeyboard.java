@@ -25,7 +25,7 @@ public class StenoKeyboard extends InputMethodService {
     private Dictionary dictionary;
     private TouchLayer keyboardView;
     private LinearLayout candidatesView;
-    private Boolean debug = true;
+    private Boolean debug = false;
 
     @Override
     public void onCreate() {

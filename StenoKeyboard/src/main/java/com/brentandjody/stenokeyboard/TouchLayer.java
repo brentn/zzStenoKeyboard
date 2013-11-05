@@ -37,13 +37,14 @@ public class TouchLayer extends LinearLayout implements SharedPreferences.OnShar
         put("-T", "-9");
     }};
     private static final int NUM_PATHS = 2;
-    private static final int MIN_KBD_HEIGHT = 400;
+    private static final int MIN_KBD_HEIGHT = 300;
     private static Paint PAINT = new Paint();
     private SharedPreferences prefs;
     private List<Button> keys = new ArrayList<Button>();
     private Path[] paths = new Path[NUM_PATHS];
     private Button sendKey;
     private Context context;
+    private int displayHeight;
     private Boolean autoSend = true;
 
 
@@ -66,39 +67,18 @@ public class TouchLayer extends LinearLayout implements SharedPreferences.OnShar
     }
 
     private void init() {
-        prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        autoSend = ! prefs.getBoolean("pref_key_send_button", false);
         PAINT.setColor(getResources().getColor(android.R.color.holo_blue_bright));
         PAINT.setAntiAlias(true);
         PAINT.setDither(true);
         PAINT.setStyle(Paint.Style.STROKE);
         PAINT.setStrokeJoin(Paint.Join.ROUND);
         PAINT.setStrokeCap(Paint.Cap.ROUND);
-        PAINT.setStrokeWidth(12);
+        PAINT.setStrokeWidth(8);
     }
 
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
-        customizeKeyLayout();
-    }
-
-    @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
-        customizeKeyLayout();
-    }
-
-    @Override
-    protected void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
-        for (int i=0; i<NUM_PATHS; i++) {
-            canvas.drawPath(paths[i], PAINT);
-        }
-    }
-
-    @Override
-    protected void onLayout(boolean changed, int l, int t, int r, int b) {
-        super.onLayout(changed, l, t, r, b);
         // find letter keys
         keys.clear();
         enumerateKeys(this);
@@ -106,13 +86,28 @@ public class TouchLayer extends LinearLayout implements SharedPreferences.OnShar
         for (int i=0; i<NUM_PATHS; i++) {
             paths[i] = new Path();
         }
-        // all this is to set the height of the keyboard
+        prefs = PreferenceManager.getDefaultSharedPreferences(context);
         WindowManager wm = (WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE);
         Display display = wm.getDefaultDisplay();
-        Point size = new Point();
-        display.getSize(size);
-        int screen_height = size.y;
-        int keyboard_height = screen_height / 3;
+        Point displaySize = new Point();
+        display.getSize(displaySize);
+        displayHeight = displaySize.y;
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
+        customizeKeyLayout();
+        invalidate();
+    }
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+        customizeKeyLayout();
+        for (int i=0; i<NUM_PATHS; i++) {
+            canvas.drawPath(paths[i], PAINT);
+        }
+        int keyboard_height = displayHeight / 4;
         if (keyboard_height < MIN_KBD_HEIGHT) keyboard_height = MIN_KBD_HEIGHT;
         this.getLayoutParams().height = keyboard_height;
     }
@@ -145,6 +140,7 @@ public class TouchLayer extends LinearLayout implements SharedPreferences.OnShar
     }
 
     private void customizeKeyLayout() {
+        if (prefs==null) return;
         int weightSetting = prefs.getInt("pref_key_vowel_key_weight", 5);
         float vowelKeyWeight = 1.25f - (weightSetting / 20f);
         autoSend = ! prefs.getBoolean("pref_key_send_button", false);
