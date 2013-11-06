@@ -67,7 +67,7 @@ public class TouchLayer extends LinearLayout implements SharedPreferences.OnShar
     }
 
     private void init() {
-        PAINT.setColor(getResources().getColor(android.R.color.holo_blue_bright));
+        PAINT.setColor(0x00ddff);
         PAINT.setAntiAlias(true);
         PAINT.setDither(true);
         PAINT.setStyle(Paint.Style.STROKE);
@@ -107,7 +107,7 @@ public class TouchLayer extends LinearLayout implements SharedPreferences.OnShar
         for (int i=0; i<NUM_PATHS; i++) {
             canvas.drawPath(paths[i], PAINT);
         }
-        int keyboard_height = displayHeight / 4;
+        int keyboard_height = displayHeight /3;
         if (keyboard_height < MIN_KBD_HEIGHT) keyboard_height = MIN_KBD_HEIGHT;
         this.getLayoutParams().height = keyboard_height;
     }
@@ -199,7 +199,7 @@ public class TouchLayer extends LinearLayout implements SharedPreferences.OnShar
                 } else {
                     List<Button> peek = peekKeys();
                     // a tap of the * button alone will autosend delete stroke
-                    if (i == 0 && peek.size() == 1 && peek.get(0).getHint().equals("*")) {
+                    if (i == 0 && peek.size() == 1 && peek.get(0).getHint() != null && peek.get(0).getHint().equals("*")) {
                         onStrokeCompleteListener.onStrokeComplete();
                     }
                     sendKey.setSelected(false);
@@ -262,8 +262,7 @@ public class TouchLayer extends LinearLayout implements SharedPreferences.OnShar
         Point topLeft = getScreenOffset(key);
         bottomRight.set(topLeft.x+key.getWidth(),
                 topLeft.y+key.getHeight());
-        if ((p.x < topLeft.x) || (p.x > bottomRight.x) || (p.y < topLeft.y) || (p.y > bottomRight.y)) return false;
-        return true;
+        return !((p.x < topLeft.x) || (p.x > bottomRight.x) || (p.y < topLeft.y) || (p.y > bottomRight.y));
     }
 
     private List<Button> peekKeys() {
@@ -277,10 +276,9 @@ public class TouchLayer extends LinearLayout implements SharedPreferences.OnShar
     }
 
     public String getStroke() {
-        String result = "";
         List<String> chord = new ArrayList<String>();
         for (Button key : keys) {
-            if (key.isSelected()) {
+            if (key.isSelected() && key.getHint() != null) {
                 chord.add(key.getHint().toString());
                 key.setSelected(false);
             }
@@ -288,8 +286,7 @@ public class TouchLayer extends LinearLayout implements SharedPreferences.OnShar
         if (chord.contains("#")) {
             chord = convertNumbers(chord);
         }
-        result = constructStroke(chord);
-        return result;
+        return constructStroke(chord);
     }
 
     private List<String> convertNumbers(List<String> chord) {
