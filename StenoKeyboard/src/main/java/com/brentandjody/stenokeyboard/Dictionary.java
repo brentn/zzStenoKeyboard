@@ -242,7 +242,7 @@ public class Dictionary {
             capitalizeNextWord = true;
             output = output.replace("{-|}","").replaceAll("\\s+$", ""); //trim space at end
         }
-        output.replace("#return", "\n");
+        output = output.replace("#Return", "\n");
         output = output.replace("{","").replace("}","");
         return output;
     }
