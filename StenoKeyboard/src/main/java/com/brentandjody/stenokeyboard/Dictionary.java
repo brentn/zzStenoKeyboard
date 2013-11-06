@@ -27,6 +27,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public class Dictionary {
 
+    public static final String NEWLINE = System.getProperty("line.separator");
+
     private static final String DICTFILE = "dict.json";
     private static final int MAX_CANDIDATES = 20;
     private static TST<String> definitions = new TST<String>();
@@ -77,6 +79,7 @@ public class Dictionary {
         if (stroke.contains("/")) {
             for (String subStroke : stroke.split("/")) {
                 translation = translate(subStroke);
+                //handle backspaces
                 while ((result.length()>0) && (translation.length()>0) && (translation.charAt(0) == '\b')) {
                     translation = translation.substring(1);
                     result = result.substring(0,result.length()-1);
@@ -104,7 +107,7 @@ public class Dictionary {
         if (strokeQ.isEmpty()) { // if there is no queue, it's easy
             translation = lookup(stroke);
             if (translation == null) {
-                updateHistory(stroke, stroke);
+                updateHistory(stroke, stroke+" ");
                 return stroke + " ";
             }
             if (translation.isEmpty()) { // ambiguous
@@ -113,8 +116,9 @@ public class Dictionary {
                 return "";
             }
             // deterministic
+            translation = decode(translation);
             updateHistory(stroke, translation);
-            return decode(translation);
+            return translation;
 
         } else { // there is a queue to deal with
             String qString = strokesInQueue();
@@ -125,9 +129,10 @@ public class Dictionary {
                 else translation = definitions.get(qString);
                 if (translation == null) {
                     translation = qString;
-                }
+                };
+                translation = decode(translation);
                 updateHistory(strokeQ, translation);
-                return decode(translation) + decode(translate(stroke));
+                return translation + decode(translate(stroke));
             }
             if (translation.isEmpty()) { // ambiguous
                 strokeQ.add(stroke);
@@ -136,8 +141,9 @@ public class Dictionary {
             }
             // deterministic
             strokeQ.add(stroke);
+            translation = decode(translation);
             updateHistory(strokeQ, translation);
-            return decode(translation);
+            return translation;
         }
     }
 
@@ -216,7 +222,7 @@ public class Dictionary {
         // short circuit if no special characters
         if (! input.contains("{")) return input+" ";
         //handle glue
-        String output = input + " ";
+        String output = input+" ";
         if (output.contains("{&")) {
             if (hasGlue) { // if the last stroke also had glue
                 output = "\b"+output;
@@ -242,7 +248,12 @@ public class Dictionary {
             capitalizeNextWord = true;
             output = output.replace("{-|}","").replaceAll("\\s+$", ""); //trim space at end
         }
-        output = output.replace("#Return", "\n");
+        output = output.replace("{#Return}", NEWLINE);
+        output = output.replace("{#BackSpace}", "\b");
+        pos = output.length()-2; //2nd character from end
+        if ((output.indexOf(NEWLINE+" ") == pos ) || (output.indexOf("\b ") == pos)) {
+            output = output.replaceAll("\\s+$", "");
+        }
         output = output.replace("{","").replace("}","");
         return output;
     }
@@ -265,7 +276,7 @@ public class Dictionary {
         Queue<String> historyItem = getHistoryItem();
         if (historyItem == null) return "\b"; //if there is no history, then backspace
         String translation = historyItem.remove();
-        String result = new String(new char[translation.length()+1]).replace("\0", "\b");
+        String result = new String(new char[translation.length()]).replace("\0", "\b");
         // put all strokes but the last one on the strokeQ
         while (! historyItem.isEmpty()) {
             strokeQ.addLast(historyItem.remove());
@@ -303,7 +314,7 @@ public class Dictionary {
         translation = history.pop();
         if (! strokeHistory.isEmpty()) {
             stroke = strokeHistory.pop();
-            while ((! stroke.isEmpty()) && (! strokeHistory.isEmpty()) && (! translation.equals(stroke)) && (! translation.equals(definitions.get(stroke)))) {
+            while ((! stroke.isEmpty()) && (! strokeHistory.isEmpty()) && (! translation.equals(stroke)) && (! translation.equals(decode(definitions.get(stroke))))) {
                 stroke =  strokeHistory.pop() + "/" + stroke;
             }
         }

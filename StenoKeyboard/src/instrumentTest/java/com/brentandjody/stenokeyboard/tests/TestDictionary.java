@@ -161,6 +161,15 @@ public class TestDictionary extends AndroidTestCase {
         assertEquals(candidates.get(1).getTranslation(),"attributing ");
     }
 
+    public void testSApecialKeys() { //#Return (R-R) and #BackSpace (PW*FP)
+        dictionary.purge();
+        assertEquals(dictionary.translate("R-R"), dictionary.NEWLINE);
+        assertEquals(dictionary.translate("TOEPB/R-R/RAODZ"), "tone "+dictionary.NEWLINE+"roads " );
+        assertEquals(dictionary.translate("R-R/R-R/AOET/R-R"), dictionary.NEWLINE+dictionary.NEWLINE+"eat "+dictionary.NEWLINE);
+        assertEquals(dictionary.translate("PW*FP"), "\b");
+        assertEquals(dictionary.translate("RAODZ/PW*FP/PW*FP"), "road");
+    }
+
 }
 
 
