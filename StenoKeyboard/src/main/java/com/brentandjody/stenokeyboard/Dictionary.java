@@ -87,6 +87,7 @@ public class Dictionary {
         }
 
         candidates.clear();
+
         // handle undo first
         if (stroke.equals("*")) {
             if (strokeQ.isEmpty()) {
@@ -138,6 +139,25 @@ public class Dictionary {
             updateHistory(strokeQ, translation);
             return decode(translation);
         }
+    }
+
+    public void purge() {
+        // erase queue and candidates and history
+        strokeQ.clear();
+        candidates.clear();
+        while (! history.isEmpty()) history.pop();
+        while (! strokeHistory.isEmpty()) strokeHistory.pop();
+    }
+
+    public String flush() {
+        //empty queue (and candidates) by returning words for what is already there.
+        String result = "";
+        String strokes = strokesInQueue();
+        if (! strokes.isEmpty())
+            result = definitions.get(strokesInQueue());
+        candidates.clear();
+        updateHistory(strokeQ, result);
+        return decode(result);
     }
 
     public void addPhraseToHistory(String phrase) {
@@ -222,6 +242,7 @@ public class Dictionary {
             capitalizeNextWord = true;
             output = output.replace("{-|}","").replaceAll("\\s+$", ""); //trim space at end
         }
+        output.replace("#return", "\n");
         output = output.replace("{","").replace("}","");
         return output;
     }
@@ -242,7 +263,7 @@ public class Dictionary {
     private String undoFromHistory() {
         // erase the latest item from history
         Queue<String> historyItem = getHistoryItem();
-        if (historyItem == null) return "";
+        if (historyItem == null) return "\b"; //if there is no history, then backspace
         String translation = historyItem.remove();
         String result = new String(new char[translation.length()+1]).replace("\0", "\b");
         // put all strokes but the last one on the strokeQ

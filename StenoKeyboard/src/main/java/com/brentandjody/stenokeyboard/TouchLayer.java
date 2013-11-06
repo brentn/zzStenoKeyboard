@@ -95,12 +95,6 @@ public class TouchLayer extends LinearLayout implements SharedPreferences.OnShar
     }
 
     @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
-        customizeKeyLayout();
-        invalidate();
-    }
-
-    @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         customizeKeyLayout();
@@ -110,6 +104,12 @@ public class TouchLayer extends LinearLayout implements SharedPreferences.OnShar
         int keyboard_height = displayHeight /3;
         if (keyboard_height < MIN_KBD_HEIGHT) keyboard_height = MIN_KBD_HEIGHT;
         this.getLayoutParams().height = keyboard_height;
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
+        customizeKeyLayout();
+        invalidate();
     }
 
     private void enumerateKeys(View v) {

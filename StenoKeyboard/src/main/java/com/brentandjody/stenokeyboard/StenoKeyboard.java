@@ -75,6 +75,20 @@ public class StenoKeyboard extends InputMethodService {
     }
 
     @Override
+    public void onUnbindInput() {
+        super.onUnbindInput();
+        sendText(dictionary.flush());
+        dictionary.purge();
+    }
+
+    @Override
+    public void onFinishInputView(boolean finishingInput) {
+        super.onFinishInputView(finishingInput);
+        sendText(dictionary.flush());
+        dictionary.purge();
+    }
+
+    @Override
     public View onCreateCandidatesView() {
         super.onCreateCandidatesView();
         LayoutInflater layoutInflater = getLayoutInflater();

@@ -51,7 +51,26 @@ public class TestDictionary extends AndroidTestCase {
         assertEquals(dictionary.lookup("SPEUPB/A"), null);
     }
 
+    public void testPurge() {
+        assertEquals(dictionary.translate("PAOEUPB/A*PL"),"pineapple ");
+        assertEquals(dictionary.translate("PAOEUPB"),"");
+        assertEquals(dictionary.getCandidates().size(), 11);
+        dictionary.purge();
+        assertEquals(dictionary.getCandidates().size(), 0);
+        assertEquals(dictionary.translate("A*PL"),"");
+        assertEquals(dictionary.translate("SAUS"),"applesauce ");
+    }
+
+    public void testFlush() {
+        assertEquals(dictionary.translate("PAOEUPB"),"");
+        assertEquals(dictionary.getCandidates().size(), 11);
+        assertEquals(dictionary.flush(),"pine ");
+        assertEquals(dictionary.getCandidates().size(), 0);
+        assertEquals(dictionary.translate("KOEPBS"),"cones ");
+    }
+
     public void testTranslate() {
+        dictionary.purge();
         // word not in dictionary
         assertEquals(dictionary.translate("-TSDZ"), "-TSDZ ");
         // multi-stroke not in dictionary
@@ -89,8 +108,9 @@ public class TestDictionary extends AndroidTestCase {
     }
 
     public void testUndo() {
+        dictionary.purge();
         // undo with no prior stroke
-        assertEquals(dictionary.translate("*"), "");
+        assertEquals(dictionary.translate("*"), "\b");
         // undo with illegal stroke
         assertEquals(dictionary.translate("-TSDZ/*"), "");
         // undo with valid stroke
@@ -110,8 +130,11 @@ public class TestDictionary extends AndroidTestCase {
         assertEquals(dictionary.translate("TPEUPB/HRAPBD/*/EURB/-G"), "finishing ");
         // undo three of four strokes
         assertEquals(dictionary.translate("RAODZ/RAODZ/RAODZ/RAODZ/*/*/*"), "roads ");
+        // test undo more than there is in history
+        assertEquals(dictionary.translate("RAOD/*/*"), "\b");
+        assertEquals(dictionary.translate("RAODZ/*/*"), "\b");
+        assertEquals(dictionary.translate("HOU/-R/-U/KW-PL/*/*/*/*/*/*/*"), "/b/b/b");
     }
-
 
     public void testGlue() {
         // start glue
