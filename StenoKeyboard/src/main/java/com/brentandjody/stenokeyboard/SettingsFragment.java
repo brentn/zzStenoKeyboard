@@ -8,6 +8,7 @@ import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
+import android.widget.Toast;
 
 public class SettingsFragment extends PreferenceFragment {
 
@@ -64,23 +65,39 @@ public class SettingsFragment extends PreferenceFragment {
             case 1:
                 if(resultCode == Activity.RESULT_OK){
                     String FilePath = data.getData().getPath();
+                    if (! FilePath.endsWith(".json")) {
+                        FilePath = "";
+                        Toast.makeText(getActivity(), "Dictionaries must be .json files", Toast.LENGTH_SHORT).show();
+                    }
                     editor.putString("pref_key_personal_dictionary_1", FilePath);
                     editor.commit();
                     dictionary_1.setText(FilePath);
                     fillSummary(dictionary_1);
-                    if (! FilePath.isEmpty())
+                    if ((FilePath+dictionary_2.getText()).isEmpty()) {
+                        default_dictionary.setChecked(true);
+                        default_dictionary.setEnabled(false);
+                    } else {
                         default_dictionary.setEnabled(true);
+                    }
                 }
                 break;
             case 2:
                 if(resultCode == Activity.RESULT_OK){
                     String FilePath = data.getData().getPath();
+                    if (! FilePath.endsWith(".json")) {
+                        FilePath = "";
+                        Toast.makeText(getActivity(), "Dictionaries must be .json files", Toast.LENGTH_SHORT).show();
+                    }
                     editor.putString("pref_key_personal_dictionary_2", FilePath);
                     editor.commit();
                     dictionary_2.setText(FilePath);
                     fillSummary(dictionary_2);
-                    if (! FilePath.isEmpty())
+                    if ((FilePath+dictionary_1.getText()).isEmpty()) {
+                        default_dictionary.setChecked(true);
+                        default_dictionary.setEnabled(false);
+                    } else {
                         default_dictionary.setEnabled(true);
+                    }
                 }
                 break;
         }
