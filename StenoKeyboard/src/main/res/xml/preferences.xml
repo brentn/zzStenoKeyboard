@@ -8,14 +8,20 @@
         android:key="pref_key_dictionary_settings">
 
         <CheckBoxPreference
-            android:title="Use embedded dictionary?"
-            android:hint="Personal dictionary (if any) will override individual definitions in this dictionary."
-            android:key="@string/use_embedded_dictionary"
+            android:title="@string/use_embedded_dictionary"
+            android:summary="Personal dictionary (if any) will override individual definitions in this dictionary."
+            android:key="pref_key_use_embedded_dictionary"
             android:defaultValue="true" />
 
-        <Preference
-            android:title="@string/personal_dictionary"
-            android:key="pref_key_personal_dictionary"/>
+        <EditTextPreference
+            android:title="@string/primary_personal_dictionary"
+            android:key="pref_key_personal_dictionary_1"
+            android:defaultValue=""/>
+
+        <EditTextPreference
+            android:title="@string/secondary_personal_dictionary"
+            android:key="pref_key_personal_dictionary_2"
+            android:defaultValue=""/>
 
     </PreferenceCategory>
 
