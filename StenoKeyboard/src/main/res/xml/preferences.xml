@@ -7,6 +7,12 @@
         android:title="@string/dictionary"
         android:key="pref_key_dictionary_settings">
 
+        <CheckBoxPreference
+            android:title="Use embedded dictionary?"
+            android:hint="Personal dictionary (if any) will override individual definitions in this dictionary."
+            android:key="@string/use_embedded_dictionary"
+            android:defaultValue="true" />
+
         <Preference
             android:title="@string/personal_dictionary"
             android:key="pref_key_personal_dictionary"/>
@@ -24,9 +30,9 @@
             android:max="10"/>
 
         <SwitchPreference
-            android:title="SEND button"
-            android:key="pref_key_send_button"
-            android:defaultValue="true" />
+            android:title="Auto-send?"
+            android:key="pref_key_autosend"
+            android:defaultValue="false" />
 
     </PreferenceCategory>
 

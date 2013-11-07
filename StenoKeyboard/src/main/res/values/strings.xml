@@ -4,4 +4,5 @@
     <string name="steno_keyboard_settings">Steno Keyboard Settings</string>
     <string name="dictionary">Dictionary</string>
     <string name="personal_dictionary">Personal Dictionary</string>
+    <string name="use_embedded_dictionary">use_embedded_dictionary</string>
 </resources>
