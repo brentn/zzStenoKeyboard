@@ -51,26 +51,7 @@ public class TestDictionary extends AndroidTestCase {
         assertEquals(dictionary.lookup("SPEUPB/A"), null);
     }
 
-    public void testPurge() {
-        assertEquals(dictionary.translate("PAOEUPB/A*PL"),"pineapple ");
-        assertEquals(dictionary.translate("PAOEUPB"),"");
-        assertEquals(dictionary.getCandidates().size(), 11);
-        dictionary.purge();
-        assertEquals(dictionary.getCandidates().size(), 0);
-        assertEquals(dictionary.translate("A*PL"),"");
-        assertEquals(dictionary.translate("SAUS"),"applesauce ");
-    }
-
-    public void testFlush() {
-        assertEquals(dictionary.translate("PAOEUPB"),"");
-        assertEquals(dictionary.getCandidates().size(), 11);
-        assertEquals(dictionary.flush(),"pine ");
-        assertEquals(dictionary.getCandidates().size(), 0);
-        assertEquals(dictionary.translate("KOEPBS"),"cones ");
-    }
-
     public void testTranslate() {
-        dictionary.purge();
         // word not in dictionary
         assertEquals(dictionary.translate("-TSDZ"), "-TSDZ ");
         // multi-stroke not in dictionary
@@ -105,6 +86,24 @@ public class TestDictionary extends AndroidTestCase {
         //phrase
         assertEquals(dictionary.translate("SPEUPB/A/ROUPBD/RAODZ/-PLT"), "spin around roads . ");
         assertEquals(dictionary.translate("KPA*/WHA/WR/U/THEU/-G/KW-PL"), "\bWhat were you thinking ? ");
+    }
+
+    public void testPurge() {
+        assertEquals(dictionary.translate("PAOEUPB/A*PL"),"pineapple ");
+        assertEquals(dictionary.translate("PAOEUPB"),"");
+        assertEquals(dictionary.getCandidates().size(), 11);
+        dictionary.purge();
+        assertEquals(dictionary.getCandidates().size(), 0);
+        assertEquals(dictionary.translate("A*PL"),"");
+        assertEquals(dictionary.translate("SAUS"),"applesauce ");
+    }
+
+    public void testFlush() {
+        assertEquals(dictionary.translate("PAOEUPB"),"");
+        assertEquals(dictionary.getCandidates().size(), 11);
+        assertEquals(dictionary.flush(),"pine ");
+        assertEquals(dictionary.getCandidates().size(), 0);
+        assertEquals(dictionary.translate("KOEPBS"),"cones ");
     }
 
     public void testUndo() {
@@ -161,7 +160,7 @@ public class TestDictionary extends AndroidTestCase {
         assertEquals(candidates.get(1).getTranslation(),"attributing ");
     }
 
-    public void testSApecialKeys() { //#Return (R-R) and #BackSpace (PW*FP)
+    public void testSpecialKeys() { //#Return (R-R) and #BackSpace (PW*FP)
         dictionary.purge();
         assertEquals(dictionary.translate("R-R"), dictionary.NEWLINE);
         assertEquals(dictionary.translate("TOEPB/R-R/RAODZ"), "tone "+dictionary.NEWLINE+"roads " );

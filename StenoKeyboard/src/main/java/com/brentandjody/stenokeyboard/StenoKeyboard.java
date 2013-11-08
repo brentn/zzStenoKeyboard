@@ -110,8 +110,9 @@ public class StenoKeyboard extends InputMethodService {
                     @Override
                     public void onClick(View view) {
                         String phrase = ((TextView) view).getText().toString();
-                        dictionary.addPhraseToHistory(phrase);
-                        sendText(phrase + " ");
+                        String stroke = ((TextView) view).getHint().toString();
+                        dictionary.updateHistory(stroke, phrase);
+                        sendText(phrase);
                         candidatesView.removeAllViews();
                         setCandidatesViewShown(false);
                     }

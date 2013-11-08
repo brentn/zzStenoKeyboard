@@ -3,6 +3,7 @@ package com.brentandjody.stenokeyboard;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.os.AsyncTask;
+import android.util.Log;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
@@ -18,12 +19,12 @@ import java.util.Queue;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.LinkedBlockingQueue;
 
-/**
- * Created by brent on 16/10/13.
- * Lookup words/phrases in steno dictionary
- * Add spacing
- * Decode several "special characters"
- */
+
+//Load and manage steno dictionary
+//Lookup words/phrases, decode special characters
+//auto-insert spaces
+//Maintain history & implement undo
+
 
 public class Dictionary {
 
@@ -69,105 +70,193 @@ public class Dictionary {
         return definitions.get(stroke); //if exists
     }
 
-    public String translate(String stroke) {
-        // lookup and disambiguate multiple strokes (using cache)
-        // interpret special keystrokes
-
-        String translation;
+    public String translate(String strokes) {
+    // break up multi-stroke entries and translate one piece at a time
         String result = "";
-        // handle multi-stroke input recursively
-        if (stroke.contains("/")) {
-            for (String subStroke : stroke.split("/")) {
-                translation = translate(subStroke);
-                //handle backspaces
-                while ((result.length()>0) && (translation.length()>0) && (translation.charAt(0) == '\b')) {
-                    translation = translation.substring(1);
-                    result = result.substring(0,result.length()-1);
+        for (String stroke : strokes.split("/")) {
+            result = result+stroke_translate(stroke);
+            if (BuildConfig.DEBUG) Log.d("BACKSPACE-before", result);
+            result = eliminate_backspaces(result);
+            if (BuildConfig.DEBUG) Log.d("BACKSPACE-after", result);
+        }
+        return result;
+    }
+
+    private String eliminate_backspaces(String input) {
+    // iterate over string, removing characters before \b
+        if (! input.contains("\b")) return input; //there are no backspaces
+        StringBuilder result = new StringBuilder();
+        for (char c : input.toCharArray()) {
+            if (c == '\b') {
+                if ((result.length() > 0) && (result.charAt(result.length()-1) != '\b')) {
+                    result.deleteCharAt(result.length()-1);
+                } else {
+                    result.append(c);
                 }
-                result += translation;
-            }
-            return result;
-        }
-
-        candidates.clear();
-
-        // handle undo first
-        if (stroke.equals("*")) {
-            if (strokeQ.isEmpty()) {
-                return undoFromHistory();
             } else {
-                // pop the stroke queue twice, and replay the last stroke
-                strokeQ.removeLast();
-                stroke = strokesInQueue();
-                generateCandidates(stroke);
-                return "";
+                result.append(c);
             }
         }
+        if (BuildConfig.DEBUG) Log.d("BACKSPACE", input + " --> " + result.toString());
+        return result.toString();
+    }
 
-        if (strokeQ.isEmpty()) { // if there is no queue, it's easy
+    private String stroke_translate(String stroke) {
+    // translate and decode a single stroke
+        String translation, result;
+        candidates.clear();
+        if (stroke.equals("*")) {
+            return undo_last_stroke();
+        }
+        // if there is no queue...
+        if (strokeQ.isEmpty()) {
             translation = lookup(stroke);
-            if (translation == null) {
-                updateHistory(stroke, stroke+" ");
-                return stroke + " ";
+            if (is_deterministic(translation)) { // deterministic stroke
+                result = decode(translation);
+                updateHistory(stroke, result);
+            } else {
+                if (is_ambiguous(translation)) { //ambiguous stroke
+                    strokeQ.add(stroke);
+                    generateCandidates(stroke);
+                    result = "";
+                } else { //not a valid stroke
+                    result = stroke+" ";
+                    updateHistory(stroke, result);
+                }
             }
-            if (translation.isEmpty()) { // ambiguous
-                strokeQ.add(stroke);
-                generateCandidates(strokesInQueue());
-                return "";
-            }
-            // deterministic
-            translation = decode(translation);
-            updateHistory(stroke, translation);
-            return translation;
-
         } else { // there is a queue to deal with
-            String qString = strokesInQueue();
-            translation = (lookup(qString+"/"+stroke));
-            if (translation == null) {
-                // the full stroke was not found, so let's break it up
-                if (qString.isEmpty()) translation=null;
-                else translation = definitions.get(qString);
-                if (translation == null) {
-                    translation = qString;
-                };
-                translation = decode(translation);
-                updateHistory(strokeQ, translation);
-                return translation + decode(translate(stroke));
-            }
-            if (translation.isEmpty()) { // ambiguous
+            translation = (lookup(strokesInQueue()+"/"+stroke));
+            if (is_deterministic(translation)) { // deterministic
                 strokeQ.add(stroke);
-                generateCandidates(strokesInQueue());
-                return "";
+                result = decode(translation);
+                updateHistory(strokeQ, result);
+            } else {
+                if (is_ambiguous(translation)) { // ambiguous
+                    strokeQ.add(stroke);
+                    generateCandidates(strokesInQueue());
+                    result = "";
+                } else {// full stroke was not found
+                    result = definitions.get(strokesInQueue());
+                    if (result == null) {
+                        result = strokesInQueue()+" ";
+                    } else {
+                        result = decode(result);
+                    }
+                    updateHistory(strokeQ, result);
+                    return result+translate(stroke);
+                }
             }
-            // deterministic
-            strokeQ.add(stroke);
-            translation = decode(translation);
-            updateHistory(strokeQ, translation);
-            return translation;
         }
+        return result;
+    }
+
+//    private String find_best_pair() {
+//    // process the stroke queue as two words if possible
+//        // try every combination of 2 words, and score as follows:
+//        String firstWord, lastWord, firstStroke, lastStroke;
+//        int score;
+//        String strokes = strokesInQueue();
+//        int maxscore = 0;
+//        int pos = strokes.lastIndexOf("/");
+//        int winningpos = pos;
+//        while (pos > 0 && pos < strokes.length()) {
+//            firstStroke = strokes.substring(0,pos);
+//            lastStroke = strokes.substring(pos+1);
+//            firstWord = lookup(firstStroke);
+//            lastWord = lookup(lastStroke);
+//            score = score_of(firstWord, false)+score_of(lastWord, true);
+//            if (score > maxscore) {
+//                maxscore = score;
+//                winningpos = pos;
+//            }
+//            pos = firstStroke.lastIndexOf("/");
+//        }
+//        // return the combination with the highest score.
+//        // put used strokes in history
+//        firstStroke = strokes.substring(0, winningpos);
+//        firstWord = lookup(firstStroke);
+//        if (is_ambiguous(firstWord)) {
+//            firstWord = definitions.get(firstStroke);
+//        }
+//        if (firstWord == null) {
+//            firstWord = firstStroke+" ";
+//        } else {
+//            firstWord = decode(firstWord);
+//        }
+//        updateHistory(firstStroke, firstWord);
+//        // If ambiguous word at end, leave stroke(s) in the queue
+//        strokeQ.clear();
+//        lastStroke = strokes.substring(winningpos+1);
+//        lastWord = lookup(lastStroke);
+//        if (is_ambiguous(lastWord)) {
+//            for (String stroke : lastStroke.split("/")) {
+//                strokeQ.add(stroke);
+//            }
+//        } else {
+//            if (lastWord == null) {
+//                lastWord = lastStroke+" ";
+//            } else {
+//                lastWord = decode(lastWord);
+//            }
+//            updateHistory(lastStroke, lastWord);
+//        }
+//        return firstWord+lastWord;
+//    }
+//
+//    private int score_of (String s, Boolean atEnd) {
+//        //score a pair of words, used to rate which combo is the best
+//        int result = 0;
+//        if (is_deterministic(s)) result += 5;
+//        if (is_ambiguous(s)) {
+//            if (atEnd) result += 6;
+//            else result += 2;
+//        }
+//        return result;
+//    }
+
+    private Boolean is_deterministic(String s) {
+        // not null and not empty
+        return (! (s == null || s.isEmpty()));
+    }
+
+    private Boolean is_ambiguous(String s) {
+        // not null and is empty
+        return ((s != null) && (s.isEmpty()));
+    }
+
+    private String undo_last_stroke() {
+        if (strokeQ.isEmpty()) return undoFromHistory();
+        //pop the stroke queue, and replay the last stroke
+        strokeQ.removeLast();
+        if (strokeQ.isEmpty()) return undoFromHistory();
+        generateCandidates(strokesInQueue());
+        return "";
     }
 
     public void purge() {
         // erase queue and candidates and history
         strokeQ.clear();
         candidates.clear();
-        while (! history.isEmpty()) history.pop();
-        while (! strokeHistory.isEmpty()) strokeHistory.pop();
+        history.clear();
+        strokeHistory.clear();
     }
 
     public String flush() {
         //empty queue (and candidates) by returning words for what is already there.
         String result = "";
-        String strokes = strokesInQueue();
-        if (! strokes.isEmpty())
-            result = definitions.get(strokesInQueue());
+        if (! strokeQ.isEmpty()) {
+            String strokes = strokesInQueue();
+            if (lookup(strokes)!=null) {
+                result = decode(definitions.get(strokes));
+            }
+            if (result.isEmpty()) {
+                result = strokes + " ";
+            }
+            updateHistory(strokeQ, result);
+            strokeQ.clear();
+        }
         candidates.clear();
-        updateHistory(strokeQ, result);
-        return decode(result);
-    }
-
-    public void addPhraseToHistory(String phrase) {
-        updateHistory(strokeQ, phrase);
+        return result;
     }
 
     public List<Definition> getCandidates() {
@@ -258,7 +347,7 @@ public class Dictionary {
         return output;
     }
 
-    private void updateHistory(Object stroke, String translation) {
+    public void updateHistory(Object stroke, String translation) {
         if (stroke instanceof String) {
             strokeHistory.push((String) stroke);
         }
@@ -350,6 +439,10 @@ public class Dictionary {
                 return stack.removeFirst();
             }
             return null;
+        }
+
+        public void clear() {
+            stack.clear();
         }
     }
 
