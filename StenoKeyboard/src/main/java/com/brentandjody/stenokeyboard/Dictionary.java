@@ -42,13 +42,29 @@ public class Dictionary {
     private Boolean hasGlue = false;
     private Context context;
 
+    public static String getDictFile() {
+        return DICTFILE;
+    }
+
     public Dictionary(Context c) {
         context = c;
         if (! loaded) load(DICTFILE);
     }
 
-    public void load(String filename) {
-        new loadDictionary().execute(filename);
+    public Dictionary(Context c, String... filenames) {
+        context = c;
+        if (! loaded) {
+            load(filenames);
+        }
+    }
+
+    public void load(String... filenames) {
+        new loadDictionary().execute(filenames);
+    }
+
+    public void unload() {
+        definitions = new TST<String>();
+        loaded = false;
     }
 
     public boolean isLoaded() {

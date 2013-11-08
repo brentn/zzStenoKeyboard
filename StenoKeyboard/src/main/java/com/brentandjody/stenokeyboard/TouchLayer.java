@@ -143,7 +143,7 @@ public class TouchLayer extends LinearLayout implements SharedPreferences.OnShar
         if (prefs==null) return;
         int weightSetting = prefs.getInt("pref_key_vowel_key_weight", 5);
         float vowelKeyWeight = 1.25f - (weightSetting / 20f);
-        autoSend = ! prefs.getBoolean("pref_key_send_button", false);
+        autoSend = prefs.getBoolean("pref_key_autosend", false);
         if (autoSend) {
             ((LinearLayout) this.findViewById(R.id.send_button).getParent()).setVisibility(GONE);
         } else {

@@ -1,7 +1,9 @@
 package com.brentandjody.stenokeyboard;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.inputmethodservice.InputMethodService;
+import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -12,6 +14,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -26,11 +29,12 @@ public class StenoKeyboard extends InputMethodService {
     private TouchLayer keyboardView;
     private LinearLayout candidatesView;
     private Boolean debug = false;
+    private SharedPreferences prefs;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        dictionary = new Dictionary(getApplicationContext());
+        loadDictionaries();
     }
 
 
@@ -153,4 +157,17 @@ public class StenoKeyboard extends InputMethodService {
         }
     }
 
+    private void loadDictionaries() {
+        prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        String dict;
+        List<String> customDictionaries = new ArrayList<String>();
+        if (prefs.getBoolean("pref_key_use_embedded_dictionary",true)) {
+            customDictionaries.add(Dictionary.getDictFile());
+        }
+        dict = prefs.getString("pref_key_personal_dictionary_1", "");
+        if (! dict.isEmpty()) customDictionaries.add(dict);
+        dict = prefs.getString("pref_key_personal_dictionary_2", "");
+        if (! dict.isEmpty()) customDictionaries.add(dict);
+        dictionary = new Dictionary(getApplicationContext(), customDictionaries.toArray(new String[0]));
+    }
 }
