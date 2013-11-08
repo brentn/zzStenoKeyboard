@@ -133,7 +133,7 @@ public class TestDictionary extends AndroidTestCase {
         dictionary.purge(); //clear history
         assertEquals(dictionary.translate("RAOD/*/*"), "\b");
         assertEquals(dictionary.translate("RAODZ/*/*"), "\b");
-        assertEquals(dictionary.translate("HOU/-R/-U/KW-PL/*/*/*/*/*/*/*"), "\b\b\b");
+        assertEquals(dictionary.translate("HOU/-R/U/KW-PL/*/*/*/*/*/*/*"), "\b\b\b");
     }
 
     public void testGlue() {

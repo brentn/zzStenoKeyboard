@@ -329,6 +329,7 @@ public class Dictionary {
         }
         // short circuit if no special characters
         if (! input.contains("{")) return input+" ";
+        if (BuildConfig.DEBUG) Log.d("decode", "input:"+input+"   size: "+input.length());
         //handle glue
         String output = input+" ";
         if (output.contains("{&")) {
@@ -356,13 +357,15 @@ public class Dictionary {
             capitalizeNextWord = true;
             output = output.replace("{-|}","").replaceAll("\\s+$", ""); //trim space at end
         }
-        output = output.replace("{#Return}", NEWLINE);
+        if (BuildConfig.DEBUG) Log.d("decode", "output:"+output+"   size: "+output.length());
+        output = output.replace("{#Return}", "\n");
         output = output.replace("{#BackSpace}", "\b");
         pos = output.length()-2; //2nd character from end
         if ((output.indexOf(NEWLINE+" ") == pos ) || (output.indexOf("\b ") == pos)) {
-            output = output.replaceAll("\\s+$", "");
+            output = output.replaceAll(" +$", "");
         }
         output = output.replace("{","").replace("}","");
+        if (BuildConfig.DEBUG) Log.d("decode", "output:"+output+"   size: "+output.length());
         return output;
     }
 
