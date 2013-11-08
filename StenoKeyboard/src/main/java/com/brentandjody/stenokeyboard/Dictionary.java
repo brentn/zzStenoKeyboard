@@ -36,8 +36,8 @@ public class Dictionary {
     private static Boolean loaded = false;
     private Deque<String> strokeQ = new LinkedBlockingDeque<String>();
     private List<Definition> candidates = new ArrayList<Definition>();
-    private History history = new History();
-    private History strokeHistory = new History();
+    private LimitedSizeQueue history = new LimitedSizeQueue();
+    private LimitedSizeQueue strokeHistory = new LimitedSizeQueue();
     private Boolean capitalizeNextWord = false;
     private Boolean hasGlue = false;
     private Context context;
@@ -72,18 +72,23 @@ public class Dictionary {
 
     public String translate(String strokes) {
     // break up multi-stroke entries and translate one piece at a time
+    // remove any backspaces in the middle of the translation
+    // but leave any at the start
         String result = "";
+        if (BuildConfig.DEBUG) Log.d("translate", "strokes: "+strokes);
+
         for (String stroke : strokes.split("/")) {
+            if (BuildConfig.DEBUG) Log.d("translate", "stroke: "+stroke);
             result = result+stroke_translate(stroke);
-            if (BuildConfig.DEBUG) Log.d("BACKSPACE-before", result);
             result = eliminate_backspaces(result);
-            if (BuildConfig.DEBUG) Log.d("BACKSPACE-after", result);
+            if (BuildConfig.DEBUG) Log.d("translate", "result: "+result+"   length: "+result.length()+"   queue: "+strokeQ.size());
         }
         return result;
     }
 
     private String eliminate_backspaces(String input) {
-    // iterate over string, removing characters before \b
+    // iterate over string, removing characters before \b (except \b itself)
+        if (BuildConfig.DEBUG) Log.d("eliminate_backspaces", "input: "+input+"   length: "+input.length());
         if (! input.contains("\b")) return input; //there are no backspaces
         StringBuilder result = new StringBuilder();
         for (char c : input.toCharArray()) {
@@ -97,16 +102,19 @@ public class Dictionary {
                 result.append(c);
             }
         }
-        if (BuildConfig.DEBUG) Log.d("BACKSPACE", input + " --> " + result.toString());
+        if (BuildConfig.DEBUG) Log.d("eliminate_backspaces", "result: " + result.toString()+"   length: "+result.toString().length());
         return result.toString();
     }
 
     private String stroke_translate(String stroke) {
     // translate and decode a single stroke
+        if (BuildConfig.DEBUG) Log.d("stroke_translate", "stroke: "+stroke+"   queue: "+strokeQ.size());
         String translation, result;
         candidates.clear();
         if (stroke.equals("*")) {
-            return undo_last_stroke();
+            result = undo_last_stroke();
+            if (BuildConfig.DEBUG) Log.d("stroke_translate", "result 1: "+result+"   queue: "+strokeQ.size());
+            return result;
         }
         // if there is no queue...
         if (strokeQ.isEmpty()) {
@@ -143,10 +151,13 @@ public class Dictionary {
                         result = decode(result);
                     }
                     updateHistory(strokeQ, result);
-                    return result+translate(stroke);
+                    result += stroke_translate(stroke);
+                    if (BuildConfig.DEBUG) Log.d("stroke_translate", "result 2: "+result+"   queue: "+strokeQ.size());
+                    return result;
                 }
             }
         }
+        if (BuildConfig.DEBUG) Log.d("stroke_translate", "result: "+result+"   queue: "+strokeQ.size());
         return result;
     }
 
@@ -225,20 +236,28 @@ public class Dictionary {
     }
 
     private String undo_last_stroke() {
-        if (strokeQ.isEmpty()) return undoFromHistory();
-        //pop the stroke queue, and replay the last stroke
-        strokeQ.removeLast();
-        if (strokeQ.isEmpty()) return undoFromHistory();
+        if (BuildConfig.DEBUG) Log.d("undo_last_stroke", "stokeQ: "+strokeQ.size()+"   history:"+history.size());
+        String result;
+        if (! strokeQ.isEmpty()) {
+            strokeQ.removeLast();
+        } else {
+           result = undoFromHistory();
+            if (BuildConfig.DEBUG) Log.d("undo_last_stroke", "result: "+result+"   strokeQ: "+strokeQ.size()+"   history:"+history.size());
+            return result;
+        }
         generateCandidates(strokesInQueue());
+        if (BuildConfig.DEBUG) Log.d("undo_last_stroke", "result:   strokeQ: "+strokeQ.size()+"   history:"+history.size());
         return "";
     }
 
     public void purge() {
         // erase queue and candidates and history
+        if (BuildConfig.DEBUG) Log.d("purgeHistory", "BEFORE history:"+history.size()+"   strokeHistory:"+strokeHistory.size());
         strokeQ.clear();
         candidates.clear();
         history.clear();
         strokeHistory.clear();
+        if (BuildConfig.DEBUG) Log.d("purgeHistory", "AFTER history:"+history.size()+"   strokeHistory:"+strokeHistory.size());
     }
 
     public String flush() {
@@ -302,7 +321,7 @@ public class Dictionary {
     private String decode(String input) {
         // decode special dictionary codes
         // add space if not overridden
-        if (input.isEmpty()) return "";
+        if (input == null || input.isEmpty()) return "";
         input = input.trim();
         if (capitalizeNextWord) {
             input = input.substring(0,1).toUpperCase() + input.substring(1);
@@ -362,18 +381,19 @@ public class Dictionary {
 
     private String undoFromHistory() {
         // erase the latest item from history
+        if (BuildConfig.DEBUG) Log.d("undoFromHistory", "starting");
         Queue<String> historyItem = getHistoryItem();
-        if (historyItem == null) return "\b"; //if there is no history, then backspace
+        if (historyItem == null) return "\b"; // return backspace if there is no history
         String translation = historyItem.remove();
         String result = new String(new char[translation.length()]).replace("\0", "\b");
+        if (BuildConfig.DEBUG) Log.d("undoFromHistory", "translation: " +translation+"   result length: "+result.length());
         // put all strokes but the last one on the strokeQ
         while (! historyItem.isEmpty()) {
             strokeQ.addLast(historyItem.remove());
         }
         strokeQ.removeLast();
         if (strokeQ.isEmpty()) {
-            // get one more item from history, if it is ambiguous put it on the queue,
-            // otherwise put it back in the history
+            // get one more item from history,
             historyItem = getHistoryItem();
             if (historyItem == null) return result;
             translation = historyItem.remove();
@@ -381,45 +401,55 @@ public class Dictionary {
             while (! historyItem.isEmpty()) {
                 strokes += "/" + historyItem.remove();
             }
-            if (translation.equals(lookup(strokes))) {
+            if (BuildConfig.DEBUG) Log.d("undoFromHistory", "Second Stroke: translation: " +translation+"   strokes: "+strokes);
+            //if it is deterministic, put it back in history, otherwise put it on the queue
+            if (translation.equals(decode(lookup(strokes)))) {
+                if (BuildConfig.DEBUG) Log.d("undoFromHistory", "deterministic");
                 history.push(translation);
                 for (String s : strokes.split("/")) {
                     strokeHistory.push(s);
                 }
             } else {
-                result += new String(new char[translation.length()+1]).replace("\0", "\b");
+                if (BuildConfig.DEBUG) Log.d("undoFromHistory", "ambiguous");
+                result += new String(new char[translation.length()]).replace("\0", "\b");
                 for (String s : strokes.split("/")) {
                     strokeQ.addLast(s);
                 }
             }
         }
+        if (BuildConfig.DEBUG) Log.d("undoFromHistory", "result length: " +result.length());
         return result;
     }
 
     private Queue<String> getHistoryItem() {
         if (history.isEmpty()) return null;
+        if (BuildConfig.DEBUG) Log.d("getHistoryItem", "history: "+history.size()+"   strokeHistory: "+strokeHistory.size());
         String translation, stroke;
         stroke = "";
         translation = history.pop();
         if (! strokeHistory.isEmpty()) {
             stroke = strokeHistory.pop();
-            while ((! stroke.isEmpty()) && (! strokeHistory.isEmpty()) && (! translation.equals(stroke)) && (! translation.equals(decode(definitions.get(stroke))))) {
+            while ((! stroke.isEmpty())
+                    && (! strokeHistory.isEmpty())
+                    && (! translation.equals(stroke+" "))
+                    && (! translation.equals(decode(definitions.get(stroke))))) {
                 stroke =  strokeHistory.pop() + "/" + stroke;
             }
         }
         Queue<String> result = new LinkedBlockingQueue<String>();
         result.add(translation);
+        if (BuildConfig.DEBUG) Log.d("getHistoryItem", "translation: "+translation+"   stroke: " +stroke);
         for (String s : stroke.split("/")) {
             result.add(s);
         }
         return result;
     }
 
-    class History {
-        private static final int MAX_SIZE = 40;
+    class LimitedSizeQueue {
+        private static final int MAX_SIZE = 60;
         private Deque<String> stack;
 
-        public History() {
+        public LimitedSizeQueue() {
             stack = new LinkedBlockingDeque<String>();
         }
 
@@ -439,6 +469,10 @@ public class Dictionary {
                 return stack.removeFirst();
             }
             return null;
+        }
+
+        public int size() {
+            return stack.size();
         }
 
         public void clear() {

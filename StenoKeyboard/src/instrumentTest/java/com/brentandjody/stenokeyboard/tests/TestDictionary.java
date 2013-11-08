@@ -117,7 +117,7 @@ public class TestDictionary extends AndroidTestCase {
         assertEquals(dictionary.translate("RAODZ"), "roads ");
         assertEquals(dictionary.translate("*"), "\b\b\b\b\b\b");
         // undo one of two strokes
-        assertEquals(dictionary.translate("RAODZ/TOGT/*"), "roads ");
+        assertEquals(dictionary.translate("RAODZ/RAFLD/*"), "roads ");
         // ensure correct number of backspaces are sent for multiple words
         assertEquals(dictionary.translate("RAODZ"), "roads ");
         assertEquals(dictionary.translate("TOGT"), "together ");
@@ -130,9 +130,10 @@ public class TestDictionary extends AndroidTestCase {
         // undo three of four strokes
         assertEquals(dictionary.translate("RAODZ/RAODZ/RAODZ/RAODZ/*/*/*"), "roads ");
         // test undo more than there is in history
+        dictionary.purge(); //clear history
         assertEquals(dictionary.translate("RAOD/*/*"), "\b");
         assertEquals(dictionary.translate("RAODZ/*/*"), "\b");
-        assertEquals(dictionary.translate("HOU/-R/-U/KW-PL/*/*/*/*/*/*/*"), "/b/b/b");
+        assertEquals(dictionary.translate("HOU/-R/-U/KW-PL/*/*/*/*/*/*/*"), "\b\b\b");
     }
 
     public void testGlue() {
@@ -162,9 +163,9 @@ public class TestDictionary extends AndroidTestCase {
 
     public void testSpecialKeys() { //#Return (R-R) and #BackSpace (PW*FP)
         dictionary.purge();
-        assertEquals(dictionary.translate("R-R"), dictionary.NEWLINE);
-        assertEquals(dictionary.translate("TOEPB/R-R/RAODZ"), "tone "+dictionary.NEWLINE+"roads " );
-        assertEquals(dictionary.translate("R-R/R-R/AOET/R-R"), dictionary.NEWLINE+dictionary.NEWLINE+"eat "+dictionary.NEWLINE);
+        assertEquals(dictionary.translate("R-R"), Dictionary.NEWLINE);
+        assertEquals(dictionary.translate("TOEPB/R-R/RAODZ"), "tone "+Dictionary.NEWLINE+"roads " );
+        assertEquals(dictionary.translate("R-R/R-R/AOET/R-R"), Dictionary.NEWLINE+Dictionary.NEWLINE+"eat "+Dictionary.NEWLINE);
         assertEquals(dictionary.translate("PW*FP"), "\b");
         assertEquals(dictionary.translate("RAODZ/PW*FP/PW*FP"), "road");
     }
