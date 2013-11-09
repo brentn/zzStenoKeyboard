@@ -24,7 +24,6 @@ public class StenoKeyboard extends InputMethodService {
 
     private static final int MAX_CANDIDATES = 20;
 
-    private Button sendButton;
     private Dictionary dictionary;
     private TouchLayer keyboardView;
     private LinearLayout candidatesView;
@@ -75,6 +74,9 @@ public class StenoKeyboard extends InputMethodService {
                 startActivity(intent);
             }
         });
+        if (! dictionary.isLoaded()) {
+            keyboardView.lock();
+        }
         return keyboardView;
     }
 
@@ -169,5 +171,12 @@ public class StenoKeyboard extends InputMethodService {
         dict = prefs.getString("pref_key_personal_dictionary_2", "");
         if (! dict.isEmpty()) customDictionaries.add(dict);
         dictionary = new Dictionary(getApplicationContext(), customDictionaries.toArray(new String[0]));
+        dictionary.setOnDictionaryLoadedListener(new Dictionary.OnDictionaryLoadedListener() {
+            @Override
+            public void onDictionaryLoaded() {
+                if (keyboardView != null) keyboardView.unlock();
+            }
+        });
+
     }
 }

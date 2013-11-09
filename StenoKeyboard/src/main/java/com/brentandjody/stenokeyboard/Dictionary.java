@@ -31,6 +31,7 @@ public class Dictionary {
     public static final String NEWLINE = System.getProperty("line.separator");
 
     private static final String DICTFILE = "dict.json";
+    private static final int HISTORY_LIMIT = 60;
     private static final int MAX_CANDIDATES = 20;
     private static TST<String> definitions = new TST<String>();
     private static Boolean loaded = false;
@@ -57,6 +58,17 @@ public class Dictionary {
             load(filenames);
         }
     }
+
+    private OnDictionaryLoadedListener onDictionaryLoadedListener;
+
+    public interface OnDictionaryLoadedListener {
+        public void onDictionaryLoaded();
+    }
+
+    public void setOnDictionaryLoadedListener(OnDictionaryLoadedListener listener) {
+        onDictionaryLoadedListener = listener;
+    }
+
 
     public void load(String... filenames) {
         new loadDictionary().execute(filenames);
@@ -177,70 +189,6 @@ public class Dictionary {
         return result;
     }
 
-//    private String find_best_pair() {
-//    // process the stroke queue as two words if possible
-//        // try every combination of 2 words, and score as follows:
-//        String firstWord, lastWord, firstStroke, lastStroke;
-//        int score;
-//        String strokes = strokesInQueue();
-//        int maxscore = 0;
-//        int pos = strokes.lastIndexOf("/");
-//        int winningpos = pos;
-//        while (pos > 0 && pos < strokes.length()) {
-//            firstStroke = strokes.substring(0,pos);
-//            lastStroke = strokes.substring(pos+1);
-//            firstWord = lookup(firstStroke);
-//            lastWord = lookup(lastStroke);
-//            score = score_of(firstWord, false)+score_of(lastWord, true);
-//            if (score > maxscore) {
-//                maxscore = score;
-//                winningpos = pos;
-//            }
-//            pos = firstStroke.lastIndexOf("/");
-//        }
-//        // return the combination with the highest score.
-//        // put used strokes in history
-//        firstStroke = strokes.substring(0, winningpos);
-//        firstWord = lookup(firstStroke);
-//        if (is_ambiguous(firstWord)) {
-//            firstWord = definitions.get(firstStroke);
-//        }
-//        if (firstWord == null) {
-//            firstWord = firstStroke+" ";
-//        } else {
-//            firstWord = decode(firstWord);
-//        }
-//        updateHistory(firstStroke, firstWord);
-//        // If ambiguous word at end, leave stroke(s) in the queue
-//        strokeQ.clear();
-//        lastStroke = strokes.substring(winningpos+1);
-//        lastWord = lookup(lastStroke);
-//        if (is_ambiguous(lastWord)) {
-//            for (String stroke : lastStroke.split("/")) {
-//                strokeQ.add(stroke);
-//            }
-//        } else {
-//            if (lastWord == null) {
-//                lastWord = lastStroke+" ";
-//            } else {
-//                lastWord = decode(lastWord);
-//            }
-//            updateHistory(lastStroke, lastWord);
-//        }
-//        return firstWord+lastWord;
-//    }
-//
-//    private int score_of (String s, Boolean atEnd) {
-//        //score a pair of words, used to rate which combo is the best
-//        int result = 0;
-//        if (is_deterministic(s)) result += 5;
-//        if (is_ambiguous(s)) {
-//            if (atEnd) result += 6;
-//            else result += 2;
-//        }
-//        return result;
-//    }
-
     private Boolean is_deterministic(String s) {
         // not null and not empty
         return (! (s == null || s.isEmpty()));
@@ -301,7 +249,7 @@ public class Dictionary {
     private void generateCandidates(String stroke) {
         candidates.clear();
         Boolean cnw = capitalizeNextWord;
-        Boolean hg = hasGlue;
+        Boolean hgl = hasGlue;
         if ((((Collection) definitions.prefixMatch(stroke+"/")).size() > 0)) {
             Definition candidate;
             // add the translation for the base stroke
@@ -321,7 +269,7 @@ public class Dictionary {
             }
         }
         capitalizeNextWord=cnw;
-        hasGlue = hg;
+        hasGlue = hgl;
     }
 
     private String strokesInQueue() {
@@ -465,7 +413,7 @@ public class Dictionary {
     }
 
     class LimitedSizeQueue {
-        private static final int MAX_SIZE = 60;
+        private static final int MAX_SIZE = HISTORY_LIMIT;
         private Deque<String> stack;
 
         public LimitedSizeQueue() {
@@ -501,10 +449,12 @@ public class Dictionary {
 
     private class loadDictionary extends AsyncTask<String, Integer, Long> {
         protected Long doInBackground(String... dictionaries) {
+            if (BuildConfig.DEBUG) Log.d("LoadDictionary", "Starting load...  Size:"+definitions.size());
             int count = dictionaries.length;
             String line, stroke, translation;
             String[] fields;
             for (int i = 0; i < count; i++) {
+                if (BuildConfig.DEBUG) Log.d("LoadDictionary", "Loading file:"+dictionaries[i]);
                 if (dictionaries[i] == null || dictionaries[i].isEmpty())
                     throw new IllegalArgumentException("Dictionary filename not provided");
                 try {
@@ -535,7 +485,8 @@ public class Dictionary {
 
       protected void onPostExecute(Long result) {
           loaded = true;
-          Toast.makeText(context, "Dictionary Loaded", Toast.LENGTH_LONG).show();
+          onDictionaryLoadedListener.onDictionaryLoaded();
+          if (BuildConfig.DEBUG) Log.d("LoadDictionary", "Load complete.  Size:"+definitions.size());
       }
     }
 }

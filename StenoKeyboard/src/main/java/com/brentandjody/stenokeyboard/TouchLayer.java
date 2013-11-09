@@ -11,10 +11,15 @@ import android.util.AttributeSet;
 import android.view.Display;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
 
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,7 +27,7 @@ import java.util.Collections;
 import java.util.Hashtable;
 import java.util.List;
 
-public class TouchLayer extends LinearLayout implements SharedPreferences.OnSharedPreferenceChangeListener {
+public class TouchLayer extends RelativeLayout implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     private static final Hashtable<String,String> NUMBER_KEYS = new Hashtable<String, String>() {{
         put("S-", "1-");
@@ -46,6 +51,8 @@ public class TouchLayer extends LinearLayout implements SharedPreferences.OnShar
     private Context context;
     private int displayHeight;
     private Boolean autoSend = true;
+    private RelativeLayout loading;
+    private Boolean locked = false;
 
 
     public TouchLayer(Context context) {
@@ -87,11 +94,8 @@ public class TouchLayer extends LinearLayout implements SharedPreferences.OnShar
             paths[i] = new Path();
         }
         prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        WindowManager wm = (WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE);
-        Display display = wm.getDefaultDisplay();
-        Point displaySize = new Point();
-        display.getSize(displaySize);
-        displayHeight = displaySize.y;
+        getDisplayHeight();
+        setupLoadingSpinner();
     }
 
     @Override
@@ -104,12 +108,60 @@ public class TouchLayer extends LinearLayout implements SharedPreferences.OnShar
         int keyboard_height = displayHeight /3;
         if (keyboard_height < MIN_KBD_HEIGHT) keyboard_height = MIN_KBD_HEIGHT;
         this.getLayoutParams().height = keyboard_height;
+        if (locked && !isLoading())
+            addView(loading);
+        if (! locked && isLoading())
+            removeView(loading);
     }
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
         customizeKeyLayout();
         invalidate();
+    }
+
+    public void lock() {
+        locked = true;
+    }
+
+    public void unlock() {
+        locked = false;
+    }
+
+    private void getDisplayHeight() {
+        WindowManager wm = (WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE);
+        Display display = wm.getDefaultDisplay();
+        Point displaySize = new Point();
+        display.getSize(displaySize);
+        displayHeight = displaySize.y;
+    }
+
+    private void setupLoadingSpinner() {
+        loading = new RelativeLayout(getContext());
+        loading.setAlpha(0.5f);
+        loading.setClickable(true);
+        RelativeLayout.LayoutParams layout = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
+        loading.setLayoutParams(layout);
+        // add spinner
+        ProgressBar spinner = new ProgressBar(getContext());
+        layout = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+        layout.addRule(RelativeLayout.CENTER_IN_PARENT);
+        spinner.setLayoutParams(layout);
+        loading.addView(spinner);
+        addView(loading);
+        // add loading text
+        TextView loadingText = new TextView(getContext());
+        layout = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+        layout.addRule(RelativeLayout.BELOW, spinner.getId());
+        layout.addRule(RelativeLayout.CENTER_IN_PARENT);
+        loadingText.setText("Loading Dictionary...");
+        loadingText.setLayoutParams(layout);
+        loading.addView(loadingText);
+    }
+
+    private Boolean isLoading() {
+        // is the loading spinner displayed?
+        return loading.getParent() != null;
     }
 
     private void enumerateKeys(View v) {
