@@ -4,22 +4,18 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.inputmethodservice.InputMethodService;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by brent on 16/10/13.
- */
 public class StenoKeyboard extends InputMethodService {
 
     private static final int MAX_CANDIDATES = 20;
@@ -27,7 +23,6 @@ public class StenoKeyboard extends InputMethodService {
     private Dictionary dictionary;
     private TouchLayer keyboardView;
     private LinearLayout candidatesView;
-    private Boolean debug = false;
     private SharedPreferences prefs;
 
     @Override
@@ -55,12 +50,10 @@ public class StenoKeyboard extends InputMethodService {
                     String stroke = keyboardView.getStroke();
                     String message = dictionary.translate(stroke);
                     populateCandidates(dictionary.getCandidates());
-                    if (debug) {
-                        Toast.makeText(getApplicationContext(), "sent: "+stroke, Toast.LENGTH_SHORT).show();
-                    }
+                    if (BuildConfig.DEBUG) Log.d("onCreateInputView", "sent stroke:"+stroke+"   translation:"+message);
                     sendText(message);
                 } else {
-                    Toast.makeText(getApplicationContext(), "Dictionary not yet loaded", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(StenoKeyboard.this, "Dictionary not yet loaded", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -126,7 +119,7 @@ public class StenoKeyboard extends InputMethodService {
                 tv.setOnLongClickListener(new View.OnLongClickListener() {
                     @Override
                     public boolean onLongClick(View view) {
-                        Toast.makeText(getApplicationContext(), ((TextView) view).getHint(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(StenoKeyboard.this, ((TextView) view).getHint(), Toast.LENGTH_LONG).show();
                         return false;
                     }
                 });
@@ -170,11 +163,12 @@ public class StenoKeyboard extends InputMethodService {
         if (! dict.isEmpty()) customDictionaries.add(dict);
         dict = prefs.getString("pref_key_personal_dictionary_2", "");
         if (! dict.isEmpty()) customDictionaries.add(dict);
-        dictionary = new Dictionary(getApplicationContext(), customDictionaries.toArray(new String[0]));
+        dictionary = new Dictionary(StenoKeyboard.this, customDictionaries.toArray(new String[0]));
         dictionary.setOnDictionaryLoadedListener(new Dictionary.OnDictionaryLoadedListener() {
             @Override
             public void onDictionaryLoaded() {
-                if (keyboardView != null) keyboardView.unlock();
+            if (keyboardView != null)
+                keyboardView.unlock();
             }
         });
 
