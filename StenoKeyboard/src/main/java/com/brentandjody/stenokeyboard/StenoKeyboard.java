@@ -140,7 +140,7 @@ public class StenoKeyboard extends InputMethodService {
                             strokeQ.add(s);
                         }
                         // do not repeat strokes already in queue
-                        strokeQ.add(stroke.replace(strokesInQueue,""));
+                        strokeQ.add(stroke.replace(strokesInQueue+"/",""));
                         dictionary.updateHistory(strokeQ, phrase);
                         dictionary.clearQ();
                         sendText(phrase);
