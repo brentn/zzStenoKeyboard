@@ -206,17 +206,19 @@ public class Dictionary {
 
     private String undo_last_stroke() {
         if (BuildConfig.DEBUG) Log.d("undo_last_stroke", "stokeQ: "+strokeQ.size()+"   history:"+history.size());
-        String result;
+        String result = "";
         if (! strokeQ.isEmpty()) {
             strokeQ.removeLast();
         } else {
            result = undoFromHistory();
-            if (BuildConfig.DEBUG) Log.d("undo_last_stroke", "result: "+result+"   strokeQ: "+strokeQ.size()+"   history:"+history.size());
-            return result;
         }
         generateCandidates(strokesInQueue());
         if (BuildConfig.DEBUG) Log.d("undo_last_stroke", "result:   strokeQ: "+strokeQ.size()+"   history:"+history.size());
-        return "";
+        return result;
+    }
+
+    public void clearQ() {
+        strokeQ.clear();
     }
 
     public void purge() {
@@ -479,6 +481,7 @@ public class Dictionary {
                     reader.close();
                     filestream.close();
                 } catch (IOException e) {
+                    if (BuildConfig.DEBUG) Log.e("LoadDictionary", e.toString());
                     System.err.println("Dictionary File: "+dictionaries[i]+" could not be found");
                 }
                 publishProgress((int) ((i / (float) count) * 100));

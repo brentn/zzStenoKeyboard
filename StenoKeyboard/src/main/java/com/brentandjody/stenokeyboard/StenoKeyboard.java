@@ -1,7 +1,9 @@
 package com.brentandjody.stenokeyboard;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.inputmethodservice.InputMethodService;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +14,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class StenoKeyboard extends InputMethodService {
@@ -21,19 +24,40 @@ public class StenoKeyboard extends InputMethodService {
     private Dictionary dictionary;
     private TouchLayer keyboardView;
     private LinearLayout candidatesView;
+    private SharedPreferences.OnSharedPreferenceChangeListener preferenceChangeListener;
 
     @Override
     public void onCreate() {
         super.onCreate();
+        dictionary = new Dictionary(this, false);
+        dictionary.setOnDictionaryResetListener(new Dictionary.OnDictionaryResetListener() {
+            @Override
+            public void onDictionaryReset() {
+                if (keyboardView != null) {
+                    keyboardView.lock();
+                }
+            }
+        });
+        dictionary.setOnDictionaryLoadedListener(new Dictionary.OnDictionaryLoadedListener() {
+            @Override
+            public void onDictionaryLoaded() {
+                if (keyboardView != null) {
+                    keyboardView.unlock();
+                }
+            }
+        });
+        preferenceChangeListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+            @Override
+            public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+                if (key.equals("pref_key_dictionary_count") || key.equals("pref_key_use_default_dictionary")) {
+                    if (BuildConfig.DEBUG) Log.d("StenoKeyboard", "Setting Changed");
+                    loadDictionaries();
+                }
+            }
+        };
+        PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(preferenceChangeListener);
         loadDictionaries();
     }
-
-
-//    @Override
-//    public boolean onEvaluateFullscreenMode() {
-//        return true;
-//    }
-
 
     @Override
     public View onCreateInputView() {
@@ -108,6 +132,7 @@ public class StenoKeyboard extends InputMethodService {
                         String phrase = ((TextView) view).getText().toString();
                         String stroke = ((TextView) view).getHint().toString();
                         dictionary.updateHistory(stroke, phrase);
+                        dictionary.clearQ();
                         sendText(phrase);
                         candidatesView.removeAllViews();
                         setCandidatesViewShown(false);
@@ -152,33 +177,31 @@ public class StenoKeyboard extends InputMethodService {
     }
 
     private void loadDictionaries() {
-        dictionary = new Dictionary(StenoKeyboard.this);
-        dictionary.setOnDictionaryResetListener(new Dictionary.OnDictionaryResetListener() {
-            @Override
-            public void onDictionaryReset() {
-                if (keyboardView != null) {
-                    keyboardView.lock();
-                }
+        List<String> dictionaries = new ArrayList<String>();
+        String dict_name;
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        // default dictionary?
+        if (prefs.getBoolean("pref_key_use_default_dictionary", true)) {
+            dict_name = Dictionary.getDictFile();
+            if (BuildConfig.DEBUG) Log.d("loadDictionaries", "loading: " + dict_name);
+            dictionaries.add(dict_name);
+        }
+        // personal dictionaries
+        int dict_count = prefs.getInt("pref_key_dictionary_count", 0);
+        for (int i=0; i<dict_count; i++) {
+            dict_name = prefs.getString("pref_key_personal_dictionary_"+(i+1), "");
+            if (BuildConfig.DEBUG) Log.d("loadDictionaries", "loading: " + dict_name);
+            if (!dict_name.isEmpty()) {
+                dictionaries.add(dict_name);
             }
-        });
-        dictionary.setOnDictionaryLoadedListener(new Dictionary.OnDictionaryLoadedListener() {
-            @Override
-            public void onDictionaryLoaded() {
-                if (keyboardView != null) {
-                    keyboardView.unlock();
-                }
-            }
-        });
-
-//        prefs = PreferenceManager.getDefaultSharedPreferences(this);
-//        String dict;
-//        List<String> customDictionaries = new ArrayList<String>();
-//        if (prefs.getBoolean("pref_key_use_embedded_dictionary",true)) {
-//            customDictionaries.add(Dictionary.getDictFile());
-//        }
-//        dict = prefs.getString("pref_key_personal_dictionary_1", "");
-//        if (! dict.isEmpty()) customDictionaries.add(dict);
-//        dict = prefs.getString("pref_key_personal_dictionary_2", "");
-//        if (! dict.isEmpty()) customDictionaries.add(dict);
+        }
+        if (! dictionaries.isEmpty()) {
+            // lock keyboard
+            if (keyboardView != null) keyboardView.lock();
+            // replace dictionaries
+            dictionary.unload();
+            dictionary.loadDictionaries(dictionaries.toArray(new String[0]));
+        }
     }
+
 }
