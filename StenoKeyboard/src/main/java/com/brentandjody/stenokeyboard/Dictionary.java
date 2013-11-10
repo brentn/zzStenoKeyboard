@@ -388,7 +388,7 @@ public class Dictionary {
             historyItem = getHistoryItem();
             if (historyItem == null) return result;
             translation = historyItem.remove();
-            result += getBackspaces(translation.length());
+            result = getBackspaces(translation.length()) + result;
             String strokes = historyItem.remove();
             while (! historyItem.isEmpty()) {
                 strokes += "/" + historyItem.remove();
