@@ -11,11 +11,8 @@ import android.util.AttributeSet;
 import android.view.Display;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
-
-import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -152,8 +149,8 @@ public class TouchLayer extends RelativeLayout implements SharedPreferences.OnSh
         // add loading text
         TextView loadingText = new TextView(getContext());
         layout = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-        layout.addRule(RelativeLayout.BELOW, spinner.getId());
         layout.addRule(RelativeLayout.CENTER_IN_PARENT);
+        layout.addRule(RelativeLayout.BELOW, spinner.getId());
         loadingText.setText("Loading Dictionary...");
         loadingText.setLayoutParams(layout);
         loading.addView(loadingText);

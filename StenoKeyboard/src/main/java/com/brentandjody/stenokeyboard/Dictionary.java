@@ -49,32 +49,37 @@ public class Dictionary {
 
     public Dictionary(Context c) {
         context = c;
-        if (! loaded) load(DICTFILE);
+        if (! loaded) loadDictionaries(DICTFILE);
     }
 
-    public Dictionary(Context c, String... filenames) {
+    public Dictionary(Context c, Boolean loadDefault) {
         context = c;
-        if (! loaded) {
-            load(filenames);
-        }
+        if (loadDefault && !loaded) loadDictionaries(DICTFILE);
+    }
+
+    private OnDictionaryResetListener onDictionaryResetListener;
+    public interface OnDictionaryResetListener {
+        public void onDictionaryReset();
+    }
+    public void setOnDictionaryResetListener(OnDictionaryResetListener listener) {
+        onDictionaryResetListener = listener;
     }
 
     private OnDictionaryLoadedListener onDictionaryLoadedListener;
-
     public interface OnDictionaryLoadedListener {
         public void onDictionaryLoaded();
     }
-
     public void setOnDictionaryLoadedListener(OnDictionaryLoadedListener listener) {
         onDictionaryLoadedListener = listener;
     }
 
 
-    public void load(String... filenames) {
+    public void loadDictionaries(String... filenames) {
         new loadDictionary().execute(filenames);
     }
 
     public void unload() {
+        onDictionaryResetListener.onDictionaryReset();
         definitions = new TST<String>();
         loaded = false;
     }

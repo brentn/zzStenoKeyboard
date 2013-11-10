@@ -1,19 +1,17 @@
 package com.brentandjody.stenokeyboard;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.inputmethodservice.InputMethodService;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.inputmethod.InputConnection;
 import android.widget.Button;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class StenoKeyboard extends InputMethodService {
@@ -23,7 +21,6 @@ public class StenoKeyboard extends InputMethodService {
     private Dictionary dictionary;
     private TouchLayer keyboardView;
     private LinearLayout candidatesView;
-    private SharedPreferences prefs;
 
     @Override
     public void onCreate() {
@@ -131,6 +128,8 @@ public class StenoKeyboard extends InputMethodService {
     }
 
     private void sendText(String message) {
+        InputConnection connection = getCurrentInputConnection();
+        if (connection == null) return; //short circuit
         // deals with backspaces
         if (message.contains("\b")) {
             // deal with any backspaces at the start first
@@ -138,7 +137,7 @@ public class StenoKeyboard extends InputMethodService {
             while (i < message.length() && message.charAt(i)=='\b')
                 i++;
             if (i > 0) {
-                getCurrentInputConnection().deleteSurroundingText(i,0);
+                connection.deleteSurroundingText(i,0);
                 message = message.substring(i);
             }
             // split the text on the first backspace, and recurse
@@ -148,29 +147,38 @@ public class StenoKeyboard extends InputMethodService {
                 sendText(message.substring(i));
             }
         } else {
-            getCurrentInputConnection().commitText(message, 1);
+            connection.commitText(message, 1);
         }
     }
 
     private void loadDictionaries() {
-        prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        String dict;
-        List<String> customDictionaries = new ArrayList<String>();
-        if (prefs.getBoolean("pref_key_use_embedded_dictionary",true)) {
-            customDictionaries.add(Dictionary.getDictFile());
-        }
-        dict = prefs.getString("pref_key_personal_dictionary_1", "");
-        if (! dict.isEmpty()) customDictionaries.add(dict);
-        dict = prefs.getString("pref_key_personal_dictionary_2", "");
-        if (! dict.isEmpty()) customDictionaries.add(dict);
-        dictionary = new Dictionary(StenoKeyboard.this, customDictionaries.toArray(new String[0]));
+        dictionary = new Dictionary(StenoKeyboard.this);
+        dictionary.setOnDictionaryResetListener(new Dictionary.OnDictionaryResetListener() {
+            @Override
+            public void onDictionaryReset() {
+                if (keyboardView != null) {
+                    keyboardView.lock();
+                }
+            }
+        });
         dictionary.setOnDictionaryLoadedListener(new Dictionary.OnDictionaryLoadedListener() {
             @Override
             public void onDictionaryLoaded() {
-            if (keyboardView != null)
-                keyboardView.unlock();
+                if (keyboardView != null) {
+                    keyboardView.unlock();
+                }
             }
         });
 
+//        prefs = PreferenceManager.getDefaultSharedPreferences(this);
+//        String dict;
+//        List<String> customDictionaries = new ArrayList<String>();
+//        if (prefs.getBoolean("pref_key_use_embedded_dictionary",true)) {
+//            customDictionaries.add(Dictionary.getDictFile());
+//        }
+//        dict = prefs.getString("pref_key_personal_dictionary_1", "");
+//        if (! dict.isEmpty()) customDictionaries.add(dict);
+//        dict = prefs.getString("pref_key_personal_dictionary_2", "");
+//        if (! dict.isEmpty()) customDictionaries.add(dict);
     }
 }

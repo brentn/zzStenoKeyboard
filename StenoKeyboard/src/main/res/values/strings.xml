@@ -7,4 +7,5 @@
     <string name="use_embedded_dictionary">use_embedded_dictionary</string>
     <string name="secondary_personal_dictionary">Secondary Personal  Dictionary</string>
     <string name="primary_personal_dictionary">Primary Personal Dictionary</string>
+    <string name="use_default_dictionary">Use default dictionary?</string>
 </resources>

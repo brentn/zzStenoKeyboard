@@ -1,105 +1,147 @@
 package com.brentandjody.stenokeyboard;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
 import android.preference.Preference;
+import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
+import android.preference.PreferenceManager;
+import android.util.Log;
 import android.widget.Toast;
 
-public class SettingsFragment extends PreferenceFragment {
+public class SettingsFragment extends PreferenceFragment implements Preference.OnPreferenceClickListener {
 
-    private EditTextPreference dictionary_1, dictionary_2;
-    private CheckBoxPreference default_dictionary;
-    private SharedPreferences.Editor editor;
+    private static final int SELECT_PERSONAL_DICTIONARY = 1;
+
+    private PreferenceCategory dictionaries;
+    private int dictionary_count;
+    private SharedPreferences prefs;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.preferences);
-
-        default_dictionary = (CheckBoxPreference) findPreference("pref_key_use_embedded_dictionary");
-        dictionary_1 = (EditTextPreference) findPreference("pref_key_personal_dictionary_1");
-        dictionary_2 = (EditTextPreference) findPreference("pref_key_personal_dictionary_2");
-        editor = getPreferenceScreen().getEditor();
-        // enable default dictionary if no personal dictionaries are defined
-        if ((dictionary_1.getText()+dictionary_2.getText()).isEmpty()) {
-            default_dictionary.setChecked(true);
-            default_dictionary.setEnabled(false);
+        prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        dictionary_count = prefs.getInt("pref_key_dictionary_count", 0);
+        dictionaries = (PreferenceCategory) findPreference("pref_cat_dictionaries");
+        if (BuildConfig.DEBUG) Log.d("Dictionary", Integer.toString(dictionary_count));
+        if (dictionary_count > 0) {
+            listPersonalDictionaries();
         }
-        dictionary_1.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                dictionary_1.getDialog().dismiss();
-                Intent intent = new Intent(Intent.ACTION_GET_CONTENT); //Intent to start openIntents File Manager
-                intent.setType("application/json");
-                startActivityForResult(intent, 1);
-                return true;
-            }
-        });
-        dictionary_2.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                dictionary_2.getDialog().dismiss();
-                Intent intent = new Intent(Intent.ACTION_GET_CONTENT); //Intent to start openIntents File Manager
-                intent.setType("application/json");
-                startActivityForResult(intent, 2);
-                return true;
-            }
-        });
+        findPreference("pref_key_add_button").setOnPreferenceClickListener(this);
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        fillSummary(dictionary_1);
-        fillSummary(dictionary_2);
+//        fillSummary(dictionary_1);
+//        fillSummary(dictionary_2);
+    }
+
+    @Override
+    public boolean onPreferenceClick(Preference preference) {
+        if (preference.getKey().equals("pref_key_add_button")) {
+            selectDictionary();
+            return true;
+        }
+        return false;
+    }
+
+    private void  selectDictionary() {
+        // browse for a dictionary
+        if (BuildConfig.DEBUG) Log.d("selectDictionary", "");
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT); //Intent to start File Manager
+        intent.setType("application/json");
+        startActivityForResult(intent, SELECT_PERSONAL_DICTIONARY);
+    }
+
+    private void listPersonalDictionaries() {
+        for (int x = 1; x <= dictionary_count; x++) {
+            String path = prefs.getString("pref_key_personal_dictionary_"+x, "");
+            if (BuildConfig.DEBUG) Log.d("listDictionary", path);
+            if (!path.isEmpty()) {
+                addDictionaryPreference(x, path);
+            }
+        }
+    }
+
+    private void addDictionaryPreference(int number, String path) {
+        EditTextPreference dict = new EditTextPreference(getActivity());
+        dict.setText("Personal dictionary "+number);
+        dict.setKey("pref_key_personal_dictionary_"+number);
+        dict.setSummary(path.substring(path.lastIndexOf("/") + 1));
+        dict.setIcon(android.R.drawable.ic_menu_delete);
+        dict.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                ((EditTextPreference) preference).getDialog().dismiss();
+                final Preference dictionary = preference;
+                AlertDialog.Builder confirm = new AlertDialog.Builder(getActivity());
+                confirm.setMessage("Remove this dictionary?")
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                dialogInterface.dismiss();
+                                removeDictionary(dictionary);
+                            }
+                        })
+                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                dialogInterface.dismiss();
+                            }
+                        }).show();
+                return true;
+            }
+        });
+        dictionaries.addPreference(dict);
+    }
+
+    private void addNewDictionary(String path) {
+        if (path.isEmpty()) return;
+        dictionary_count++;
+        prefs.edit().putInt("pref_key_dictionary_count", dictionary_count).commit();
+        prefs.edit().putString("pref_key_personal_dictionary_"+dictionary_count, path).commit();
+        // add an element
+        addDictionaryPreference(dictionary_count, path);
+    }
+
+    private void removeDictionary(Preference dictionary) {
+        dictionaries.removePreference(dictionary);
+        String key = dictionary.getKey();
+        String value;
+        //renumber higher dictionaries
+        int dict_number = Integer.parseInt(key.substring(key.lastIndexOf("_")+1));
+        while (dict_number < dictionary_count) {
+            value = prefs.getString("pref_key_personal_dictionary_"+(dict_number+1), "");
+            prefs.edit().putString("pref_key_personal_dictionary_"+dict_number, value);
+        }
+        // remove the last entry
+        prefs.edit().remove("pref_key_personal_dictionary_"+dictionary_count).commit();
+        dictionary_count--;
+        prefs.edit().putInt("pref_key_dictionary_count", dictionary_count).commit();
+        getActivity().finish();
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode) {
-            case 1:
-                if(resultCode == Activity.RESULT_OK){
-                    String FilePath = data.getData().getPath();
-                    if (! FilePath.endsWith(".json")) {
-                        FilePath = "";
+        if (resultCode == Activity.RESULT_OK) {
+            switch (requestCode) {
+                case SELECT_PERSONAL_DICTIONARY: {
+                    String filePath = data.getData().getPath();
+                    if (filePath.toLowerCase().endsWith(".json")) {
+                        addNewDictionary(filePath);
+                    } else {
                         Toast.makeText(getActivity(), "Dictionaries must be .json files", Toast.LENGTH_SHORT).show();
                     }
-                    editor.putString("pref_key_personal_dictionary_1", FilePath);
-                    editor.commit();
-                    dictionary_1.setText(FilePath);
-                    fillSummary(dictionary_1);
-                    if ((FilePath+dictionary_2.getText()).isEmpty()) {
-                        default_dictionary.setChecked(true);
-                        default_dictionary.setEnabled(false);
-                    } else {
-                        default_dictionary.setEnabled(true);
-                    }
+                    break;
                 }
-                break;
-            case 2:
-                if(resultCode == Activity.RESULT_OK){
-                    String FilePath = data.getData().getPath();
-                    if (! FilePath.endsWith(".json")) {
-                        FilePath = "";
-                        Toast.makeText(getActivity(), "Dictionaries must be .json files", Toast.LENGTH_SHORT).show();
-                    }
-                    editor.putString("pref_key_personal_dictionary_2", FilePath);
-                    editor.commit();
-                    dictionary_2.setText(FilePath);
-                    fillSummary(dictionary_2);
-                    if ((FilePath+dictionary_1.getText()).isEmpty()) {
-                        default_dictionary.setChecked(true);
-                        default_dictionary.setEnabled(false);
-                    } else {
-                        default_dictionary.setEnabled(true);
-                    }
-                }
-                break;
+            }
         }
     }
 

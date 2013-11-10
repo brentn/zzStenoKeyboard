@@ -3,25 +3,21 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent" android:layout_height="match_parent">
 
+    <CheckBoxPreference
+        android:title="@string/use_default_dictionary"
+        android:summary=""
+        android:key="pref_key_use_default_dictionary"
+        android:defaultValue="true" />
+
     <PreferenceCategory
-        android:title="@string/dictionary"
-        android:key="pref_key_dictionary_settings">
+        android:title="Personal Dictionary"
+        android:key="pref_cat_dictionaries">
 
-        <CheckBoxPreference
-            android:title="@string/use_embedded_dictionary"
-            android:summary="Personal dictionary (if any) will override individual definitions in this dictionary."
-            android:key="pref_key_use_embedded_dictionary"
-            android:defaultValue="true" />
-
-        <EditTextPreference
-            android:title="@string/primary_personal_dictionary"
-            android:key="pref_key_personal_dictionary_1"
-            android:defaultValue=""/>
-
-        <EditTextPreference
-            android:title="@string/secondary_personal_dictionary"
-            android:key="pref_key_personal_dictionary_2"
-            android:defaultValue=""/>
+        <Preference
+            android:title="Add a new dictionary"
+            android:icon="@android:drawable/ic_menu_add"
+            android:key="pref_key_add_button"
+            android:order="99"/>
 
     </PreferenceCategory>
 
