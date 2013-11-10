@@ -96,7 +96,7 @@ public class Dictionary {
             Toast.makeText(context, "Dictionary not yet loaded...", Toast.LENGTH_SHORT).show();
             return "";
         }
-        if (stroke.isEmpty()) return null;
+        if (stroke == null || stroke.isEmpty()) return null;
         if (((Collection) definitions.prefixMatch(stroke+"/")).size() > 0) {
             return ""; //ambiguous
         }
@@ -177,7 +177,9 @@ public class Dictionary {
                     generateCandidates(strokesInQueue());
                     result = "";
                 } else {// full stroke was not found
-                    result = definitions.get(strokesInQueue());
+                    result = "";
+                    if (! strokesInQueue().isEmpty())
+                        result = definitions.get(strokesInQueue());
                     if (result == null) {
                         result = strokesInQueue()+" ";
                     } else {
@@ -236,7 +238,7 @@ public class Dictionary {
         String result = "";
         if (! strokeQ.isEmpty()) {
             String strokes = strokesInQueue();
-            if (lookup(strokes)!=null) {
+            if (lookup(strokes)!=null && !strokes.isEmpty()) {
                 result = decode(definitions.get(strokes));
             }
             if (result.isEmpty()) {
@@ -254,6 +256,7 @@ public class Dictionary {
     }
 
     private void generateCandidates(String stroke) {
+        if (stroke==null || stroke.isEmpty()) return;
         candidates.clear();
         Boolean cnw = capitalizeNextWord;
         Boolean hgl = hasGlue;
@@ -268,8 +271,10 @@ public class Dictionary {
             }
             // add translations that begin with this stroke
             for (String candidateStroke : definitions.prefixMatch(stroke+"/")) {
-                candidate = new Definition(candidateStroke, decode(definitions.get(candidateStroke)));
-                candidates.add(candidate);
+                if (!candidateStroke.isEmpty()) {
+                    candidate = new Definition(candidateStroke, decode(definitions.get(candidateStroke)));
+                    candidates.add(candidate);
+                }
                 if (candidates.size() >= MAX_CANDIDATES) {
                     break;
                 }
