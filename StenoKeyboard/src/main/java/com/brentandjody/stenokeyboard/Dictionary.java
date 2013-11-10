@@ -421,24 +421,21 @@ public class Dictionary {
 
     private Queue<String> getHistoryItem() {
         if (history.isEmpty()) return null;
-        if (BuildConfig.DEBUG) Log.d("getHistoryItem", "history: "+history.size()+"   strokeHistory: "+strokeHistory.size());
-        String translation, stroke;
+        Queue<String> result = new LinkedBlockingQueue<String>();
+        String translation, stroke, nextStroke;
         stroke = "";
         translation = history.pop();
+        result.add(translation);
         if (! strokeHistory.isEmpty()) {
             stroke = strokeHistory.pop();
             while ((! stroke.isEmpty())
                     && (! strokeHistory.isEmpty())
                     && (! translation.equals(stroke+" "))
                     && (! translation.equals(decode(definitions.get(stroke))))) {
-                stroke =  strokeHistory.pop() + "/" + stroke;
+                nextStroke = strokeHistory.pop();
+                result.add(nextStroke);
+                stroke =  nextStroke + "/" + stroke;
             }
-        }
-        Queue<String> result = new LinkedBlockingQueue<String>();
-        result.add(translation);
-        if (BuildConfig.DEBUG) Log.d("getHistoryItem", "translation: "+translation+"   stroke: " +stroke);
-        for (String s : stroke.split("/")) {
-            result.add(s);
         }
         return result;
     }
