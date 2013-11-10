@@ -382,7 +382,7 @@ public class Dictionary {
         while (! historyItem.isEmpty()) {
             strokeQ.addLast(historyItem.remove());
         }
-        strokeQ.removeLast();
+        strokeQ.remove();
         if (strokeQ.isEmpty()) {
             // get one more item from history,
             historyItem = getHistoryItem();
@@ -423,11 +423,11 @@ public class Dictionary {
         if (history.isEmpty()) return null;
         Queue<String> result = new LinkedBlockingQueue<String>();
         String translation, stroke, nextStroke;
-        stroke = "";
         translation = history.pop();
         result.add(translation);
         if (! strokeHistory.isEmpty()) {
             stroke = strokeHistory.pop();
+            result.add(stroke);
             while ((! stroke.isEmpty())
                     && (! strokeHistory.isEmpty())
                     && (! translation.equals(stroke+" "))
@@ -436,6 +436,8 @@ public class Dictionary {
                 result.add(nextStroke);
                 stroke =  nextStroke + "/" + stroke;
             }
+        } else {
+            result.add(""); //need to return a stroke
         }
         return result;
     }
