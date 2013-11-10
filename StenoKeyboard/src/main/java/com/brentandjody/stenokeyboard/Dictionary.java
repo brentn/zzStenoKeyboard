@@ -294,6 +294,16 @@ public class Dictionary {
         return result;
     }
 
+    public String strokesInHistory() {
+        if (strokeHistory.isEmpty()) return "";
+        Iterator<String> it = strokeHistory.iterator();
+        String result = it.next();
+        while (it.hasNext()) {
+            result += "/" + it.next();
+        }
+        return result;
+    }
+
     private String decode(String input) {
         // decode special dictionary codes
         // add space if not overridden
@@ -360,11 +370,13 @@ public class Dictionary {
 
     private String undoFromHistory() {
         // erase the latest item from history
-        if (BuildConfig.DEBUG) Log.d("undoFromHistory", "starting");
         Queue<String> historyItem = getHistoryItem();
-        if (historyItem == null) return "\b"; // return backspace if there is no history
+        if (historyItem == null) {
+            purge();
+            return "\b"; // return backspace if there is no history
+        }
         String translation = historyItem.remove();
-        String result = new String(new char[translation.length()]).replace("\0", "\b");
+        String result = getBackspaces(translation.length());
         if (BuildConfig.DEBUG) Log.d("undoFromHistory", "translation: " +translation+"   result length: "+result.length());
         // put all strokes but the last one on the strokeQ
         while (! historyItem.isEmpty()) {
@@ -376,28 +388,35 @@ public class Dictionary {
             historyItem = getHistoryItem();
             if (historyItem == null) return result;
             translation = historyItem.remove();
+            result += getBackspaces(translation.length());
             String strokes = historyItem.remove();
             while (! historyItem.isEmpty()) {
                 strokes += "/" + historyItem.remove();
             }
             if (BuildConfig.DEBUG) Log.d("undoFromHistory", "Second Stroke: translation: " +translation+"   strokes: "+strokes);
-            //if it is deterministic, put it back in history, otherwise put it on the queue
-            if (translation.equals(decode(lookup(strokes)))) {
-                if (BuildConfig.DEBUG) Log.d("undoFromHistory", "deterministic");
-                history.push(translation);
-                for (String s : strokes.split("/")) {
-                    strokeHistory.push(s);
-                }
-            } else {
-                if (BuildConfig.DEBUG) Log.d("undoFromHistory", "ambiguous");
-                result += new String(new char[translation.length()]).replace("\0", "\b");
-                for (String s : strokes.split("/")) {
-                    strokeQ.addLast(s);
-                }
-            }
+            result += translate(strokes);  //replay strokes
+//            //if it is deterministic, put it back in history, otherwise put it on the queue
+//            if (translation.equals(decode(lookup(strokes)))) {
+//                if (BuildConfig.DEBUG) Log.d("undoFromHistory", "deterministic");
+//                history.push(translation);
+//                for (String s : strokes.split("/")) {
+//                    strokeHistory.push(s);
+//                }
+//            } else {
+//                if (BuildConfig.DEBUG) Log.d("undoFromHistory", "ambiguous");
+//                result += new String(new char[translation.length()]).replace("\0", "\b");
+//                for (String s : strokes.split("/")) {
+//                    strokeQ.addLast(s);
+//                }
+//            }
         }
-        if (BuildConfig.DEBUG) Log.d("undoFromHistory", "result length: " +result.length());
+        if (BuildConfig.DEBUG) Log.d("undoFromHistory", "stokeQ: " +strokesInQueue());
+        if (BuildConfig.DEBUG) Log.d("undoFromHistory", "history:..." + strokesInHistory());
         return result;
+    }
+
+    private String getBackspaces(int size) {
+        return new String(new char[size]).replace("\0", "\b");
     }
 
     private Queue<String> getHistoryItem() {
@@ -452,6 +471,10 @@ public class Dictionary {
 
         public int size() {
             return stack.size();
+        }
+
+        public Iterator<String> iterator() {
+            return stack.iterator();
         }
 
         public void clear() {
