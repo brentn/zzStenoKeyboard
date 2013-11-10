@@ -284,7 +284,7 @@ public class Dictionary {
         hasGlue = hgl;
     }
 
-    private String strokesInQueue() {
+    public String strokesInQueue() {
         if (strokeQ.isEmpty()) return "";
         Iterator<String> it = strokeQ.iterator();
         String result = it.next();

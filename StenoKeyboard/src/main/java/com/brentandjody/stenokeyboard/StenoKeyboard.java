@@ -15,7 +15,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.List;
+import java.util.concurrent.LinkedBlockingDeque;
 
 public class StenoKeyboard extends InputMethodService {
 
@@ -131,7 +133,15 @@ public class StenoKeyboard extends InputMethodService {
                     public void onClick(View view) {
                         String phrase = ((TextView) view).getText().toString();
                         String stroke = ((TextView) view).getHint().toString();
-                        dictionary.updateHistory(stroke, phrase);
+                        // build the a temporary queue for history
+                        String strokesInQueue = dictionary.strokesInQueue();
+                        Deque<String> strokeQ = new LinkedBlockingDeque<String>();
+                        for (String s : strokesInQueue.split("/")) {
+                            strokeQ.add(s);
+                        }
+                        // do not repeat strokes already in queue
+                        strokeQ.add(stroke.replace(strokesInQueue,""));
+                        dictionary.updateHistory(strokeQ, phrase);
                         dictionary.clearQ();
                         sendText(phrase);
                         candidatesView.removeAllViews();
