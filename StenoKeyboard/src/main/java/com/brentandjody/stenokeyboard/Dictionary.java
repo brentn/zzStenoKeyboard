@@ -15,9 +15,8 @@ import java.util.Collection;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Queue;
+import java.util.Stack;
 import java.util.concurrent.LinkedBlockingDeque;
-import java.util.concurrent.LinkedBlockingQueue;
 
 
 //Load and manage steno dictionary
@@ -266,7 +265,7 @@ public class Dictionary {
             String translation = definitions.get(stroke);
             // add this stroke (if it's a word)
             if (translation != null) {
-                candidate = new Definition(stroke,(decode(translation)));
+                candidate = new Definition(stroke, "[" + stroke + "] =>" + decode(translation));
                 candidates.add(candidate);
             }
             // add translations that begin with this stroke
@@ -370,33 +369,34 @@ public class Dictionary {
 
     private String undoFromHistory() {
         // erase the latest item from history
-        Queue<String> historyItem = getHistoryItem();
+        Stack<String> historyItem = getHistoryItem();
         if (historyItem == null) {
             purge();
-            return "\b"; // return backspace if there is no history
+            return "\b"; // return single backspace if there is no history
         }
-        String translation = historyItem.remove();
+        // start result by erasing word with backspaces
+        String translation = historyItem.pop();
         String result = getBackspaces(translation.length());
-        if (BuildConfig.DEBUG) Log.d("undoFromHistory", "translation: " +translation+"   result length: "+result.length());
-        // put all strokes but the last one on the strokeQ
-        while (! historyItem.isEmpty()) {
-            strokeQ.addLast(historyItem.remove());
+        // replay all strokes except the last one (if any)
+        Boolean replayOneMore = (historyItem.size() <= 1);
+        while (historyItem.size() > 1) {
+            result += translate(historyItem.pop());
         }
-        strokeQ.remove();
-        if (strokeQ.isEmpty()) {
-            // get one more item from history,
+        historyItem.clear();
+        // if no strokes were replayed, get one more history item and replay
+        if (!replayOneMore) {
             historyItem = getHistoryItem();
-            if (historyItem == null) return result;
-            translation = historyItem.remove();
-            result = getBackspaces(translation.length()) + result;
-            String strokes = historyItem.remove();
-            while (! historyItem.isEmpty()) {
-                strokes += "/" + historyItem.remove();
+            if (historyItem == null) {
+                purge();
             }
-            if (BuildConfig.DEBUG) Log.d("undoFromHistory", "Second Stroke: translation: " +translation+"   strokes: "+strokes);
-            result += translate(strokes);  //replay strokes
+            translation = historyItem.pop();
+            if (translation != null) {
+                result = getBackspaces(translation.length()) + result;
+            }
+            while (!historyItem.isEmpty()) {
+                result += translate(historyItem.pop());
+            }
         }
-        if (BuildConfig.DEBUG) Log.d("undoFromHistory", "stokeQ: " +strokesInQueue());
         if (BuildConfig.DEBUG) Log.d("undoFromHistory", "history:..." + strokesInHistory());
         return result;
     }
@@ -405,12 +405,11 @@ public class Dictionary {
         return new String(new char[size]).replace("\0", "\b");
     }
 
-    private Queue<String> getHistoryItem() {
+    private Stack<String> getHistoryItem() {
         if (history.isEmpty()) return null;
-        Queue<String> result = new LinkedBlockingQueue<String>();
+        Stack<String> result = new Stack<String>();
         String translation, stroke, nextStroke;
         translation = history.pop();
-        result.add(translation);
         if (! strokeHistory.isEmpty()) {
             stroke = strokeHistory.pop();
             result.add(stroke);
@@ -422,9 +421,8 @@ public class Dictionary {
                 result.add(nextStroke);
                 stroke =  nextStroke + "/" + stroke;
             }
-        } else {
-            result.add(""); //need to return a stroke
         }
+        result.add(translation);
         return result;
     }
 

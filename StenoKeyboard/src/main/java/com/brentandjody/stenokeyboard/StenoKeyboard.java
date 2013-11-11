@@ -132,6 +132,9 @@ public class StenoKeyboard extends InputMethodService {
                     @Override
                     public void onClick(View view) {
                         String phrase = ((TextView) view).getText().toString();
+                        if (phrase.contains("]") && phrase.charAt(0) == '[') {
+                            phrase = phrase.replaceFirst("\\[.+\\]","");
+                        }
                         String stroke = ((TextView) view).getHint().toString();
                         // build the a temporary queue for history
                         String strokesInQueue = dictionary.strokesInQueue();
