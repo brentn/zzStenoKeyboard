@@ -395,20 +395,6 @@ public class Dictionary {
             }
             if (BuildConfig.DEBUG) Log.d("undoFromHistory", "Second Stroke: translation: " +translation+"   strokes: "+strokes);
             result += translate(strokes);  //replay strokes
-//            //if it is deterministic, put it back in history, otherwise put it on the queue
-//            if (translation.equals(decode(lookup(strokes)))) {
-//                if (BuildConfig.DEBUG) Log.d("undoFromHistory", "deterministic");
-//                history.push(translation);
-//                for (String s : strokes.split("/")) {
-//                    strokeHistory.push(s);
-//                }
-//            } else {
-//                if (BuildConfig.DEBUG) Log.d("undoFromHistory", "ambiguous");
-//                result += new String(new char[translation.length()]).replace("\0", "\b");
-//                for (String s : strokes.split("/")) {
-//                    strokeQ.addLast(s);
-//                }
-//            }
         }
         if (BuildConfig.DEBUG) Log.d("undoFromHistory", "stokeQ: " +strokesInQueue());
         if (BuildConfig.DEBUG) Log.d("undoFromHistory", "history:..." + strokesInHistory());

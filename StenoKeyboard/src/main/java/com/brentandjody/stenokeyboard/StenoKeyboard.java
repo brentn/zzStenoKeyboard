@@ -167,22 +167,42 @@ public class StenoKeyboard extends InputMethodService {
         if (connection == null) return; //short circuit
         // deals with backspaces
         if (message.contains("\b")) {
-            // deal with any backspaces at the start first
+            // deal with any backspaces at the start of the translation
             int i = 0;
             while (i < message.length() && message.charAt(i)=='\b')
                 i++;
             if (i > 0) {
-                connection.deleteSurroundingText(i,0);
+                deleteWord(connection, i);
                 message = message.substring(i);
             }
-            // split the text on the first backspace, and recurse
-            if (message.contains("\b")) {
-                i = message.indexOf('\b');
-                sendText(message.substring(0,i));
-                sendText(message.substring(i));
-            }
+        }
+        connection.commitText(message, 1);
+    }
+
+    private void deleteWord(InputConnection connection, int size) {
+        // ensure the word left of the cursor is the correct size, and delete it.
+        // if not, delete back to the prior space and purge the history and strokeQ
+        // leave a space a the end
+        String word = connection.getTextBeforeCursor(size+1, 0).toString();
+        if (word.length() == size || (word.length() > 0 && word.charAt(0) == ' ')) {  // if first word, or...
+            connection.deleteSurroundingText(size, 0);
         } else {
-            connection.commitText(message, 1);
+            // delete a single character.  If it was a space, and size > 1, delete the next word
+            String c = connection.getTextBeforeCursor(1,0).toString();
+            if (c.length() == 1) {
+                connection.deleteSurroundingText(1,0);
+                if (c.equals(" ")) {
+                    c = connection.getTextBeforeCursor(1,0).toString();
+                    while (c.length() == 1 && !c.equals(" ")) {
+                        connection.deleteSurroundingText(1,0);
+                        c = connection.getTextBeforeCursor(1,0).toString();
+                    }
+                }
+            }
+            dictionary.purge();
+        }
+        if (!connection.getTextBeforeCursor(1,0).toString().equals(" ") && size > 1) {
+            connection.commitText(" ", 1);
         }
     }
 
