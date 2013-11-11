@@ -112,13 +112,13 @@ public class Dictionary {
         for (String stroke : strokes.split("/")) {
             if (BuildConfig.DEBUG) Log.d("translate", "stroke: "+stroke);
             result = result+stroke_translate(stroke);
-            result = eliminate_backspaces(result);
+            result = eliminate_internal_backspaces(result);
             if (BuildConfig.DEBUG) Log.d("translate", "result: "+result+"   length: "+result.length()+"   queue: "+strokeQ.size());
         }
         return result;
     }
 
-    private String eliminate_backspaces(String input) {
+    private String eliminate_internal_backspaces(String input) {
     // iterate over string, removing characters before \b (except \b itself)
         if (BuildConfig.DEBUG) Log.d("eliminate_backspaces", "input: "+input+"   length: "+input.length());
         if (! input.contains("\b")) return input; //there are no backspaces
@@ -205,19 +205,6 @@ public class Dictionary {
         return ((s != null) && (s.isEmpty()));
     }
 
-    private String undo_last_stroke() {
-        if (BuildConfig.DEBUG) Log.d("undo_last_stroke", "stokeQ: "+strokeQ.size()+"   history:"+history.size());
-        String result = "";
-        if (! strokeQ.isEmpty()) {
-            strokeQ.removeLast();
-        } else {
-           result = undoFromHistory();
-        }
-        generateCandidates(strokesInQueue());
-        if (BuildConfig.DEBUG) Log.d("undo_last_stroke", "result:   strokeQ: "+strokeQ.size()+"   history:"+history.size());
-        return result;
-    }
-
     public void clearQ() {
         strokeQ.clear();
     }
@@ -265,7 +252,7 @@ public class Dictionary {
             String translation = definitions.get(stroke);
             // add this stroke (if it's a word)
             if (translation != null) {
-                candidate = new Definition(stroke, "[" + stroke + "] =>" + decode(translation));
+                candidate = new Definition(stroke, decode(translation));
                 candidates.add(candidate);
             }
             // add translations that begin with this stroke
@@ -367,36 +354,48 @@ public class Dictionary {
         history.push(translation);
     }
 
-    private String undoFromHistory() {
-        // erase the latest item from history
-        Stack<String> historyItem = getHistoryItem();
-        if (historyItem == null) {
-            purge();
-            return "\b"; // return single backspace if there is no history
-        }
-        // start result by erasing word with backspaces
-        String translation = historyItem.pop();
-        String result = getBackspaces(translation.length());
-        // replay all strokes except the last one (if any)
-        Boolean replayOneMore = (historyItem.size() <= 1);
-        while (historyItem.size() > 1) {
-            result += translate(historyItem.pop());
-        }
-        historyItem.clear();
-        // if no strokes were replayed, get one more history item and replay
-        if (!replayOneMore) {
+    private String undo_last_stroke() {
+        String result = "";
+        String translation;
+        Stack<String> historyItem;
+        Boolean replayOneMore = false;
+        // if there are strokes in the queue, remove one
+        if (! strokeQ.isEmpty()) {
+            strokeQ.removeLast();
+            replayOneMore = (strokeQ.isEmpty());
+        } else {
+            // erase the latest item from history
             historyItem = getHistoryItem();
             if (historyItem == null) {
                 purge();
+                return "\b"; // return single backspace if there is no history
             }
+            // start result by erasing word with backspaces
             translation = historyItem.pop();
-            if (translation != null) {
-                result = getBackspaces(translation.length()) + result;
-            }
-            while (!historyItem.isEmpty()) {
+            result = getBackspaces(translation.length());
+            // replay all strokes except the last one (if any)
+            replayOneMore = (historyItem.size() <= 1);
+            while (historyItem.size() > 1) {
                 result += translate(historyItem.pop());
             }
+            historyItem.clear();
         }
+        // if no strokes were replayed, get one more history item and replay
+        if (replayOneMore) {
+            historyItem = getHistoryItem();
+            if (historyItem == null) {
+                purge();
+            } else {
+                translation = historyItem.pop();
+                if (translation != null) {
+                    result = getBackspaces(translation.length()) + result;
+                }
+                while (!historyItem.isEmpty()) {
+                    result += translate(historyItem.pop());
+                }
+            }
+        }
+        generateCandidates(strokesInQueue());
         if (BuildConfig.DEBUG) Log.d("undoFromHistory", "history:..." + strokesInHistory());
         return result;
     }
