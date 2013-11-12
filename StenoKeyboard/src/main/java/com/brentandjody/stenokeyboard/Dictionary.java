@@ -3,7 +3,6 @@ package com.brentandjody.stenokeyboard;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.os.AsyncTask;
-import android.util.Log;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
@@ -107,21 +106,16 @@ public class Dictionary {
     // remove any backspaces in the middle of the translation
     // but leave any at the start
         String result = "";
-        if (BuildConfig.DEBUG) Log.d("translate", "strokes: "+strokes);
-
         for (String stroke : strokes.split("/")) {
-            if (BuildConfig.DEBUG) Log.d("translate", "stroke: "+stroke);
             result = result+stroke_translate(stroke);
             result = eliminate_internal_backspaces(result);
-            if (BuildConfig.DEBUG) Log.d("translate", "result: "+result+"   length: "+result.length()+"   queue: "+strokeQ.size());
         }
         return result;
     }
 
     private String eliminate_internal_backspaces(String input) {
     // iterate over string, removing characters before \b (except \b itself)
-        if (BuildConfig.DEBUG) Log.d("eliminate_backspaces", "input: "+input+"   length: "+input.length());
-        if (! input.contains("\b")) return input; //there are no backspaces
+       if (! input.contains("\b")) return input; //there are no backspaces
         StringBuilder result = new StringBuilder();
         for (char c : input.toCharArray()) {
             if (c == '\b') {
@@ -134,18 +128,15 @@ public class Dictionary {
                 result.append(c);
             }
         }
-        if (BuildConfig.DEBUG) Log.d("eliminate_backspaces", "result: " + result.toString()+"   length: "+result.toString().length());
         return result.toString();
     }
 
     private String stroke_translate(String stroke) {
     // translate and decode a single stroke
-        if (BuildConfig.DEBUG) Log.d("stroke_translate", "stroke: "+stroke+"   queue: "+strokeQ.size());
         String translation, result;
         candidates.clear();
         if (stroke.equals("*")) {
             result = undo_last_stroke();
-            if (BuildConfig.DEBUG) Log.d("stroke_translate", "result 1: "+result+"   queue: "+strokeQ.size());
             return result;
         }
         // if there is no queue...
@@ -186,12 +177,10 @@ public class Dictionary {
                     }
                     updateHistory(strokeQ, result);
                     result += stroke_translate(stroke);
-                    if (BuildConfig.DEBUG) Log.d("stroke_translate", "result 2: "+result+"   queue: "+strokeQ.size());
                     return result;
                 }
             }
         }
-        if (BuildConfig.DEBUG) Log.d("stroke_translate", "result: "+result+"   queue: "+strokeQ.size());
         return result;
     }
 
@@ -211,12 +200,10 @@ public class Dictionary {
 
     public void purge() {
         // erase queue and candidates and history
-        if (BuildConfig.DEBUG) Log.d("purgeHistory", "BEFORE history:"+history.size()+"   strokeHistory:"+strokeHistory.size());
         strokeQ.clear();
         candidates.clear();
         history.clear();
         strokeHistory.clear();
-        if (BuildConfig.DEBUG) Log.d("purgeHistory", "AFTER history:"+history.size()+"   strokeHistory:"+strokeHistory.size());
     }
 
     public String flush() {
@@ -301,7 +288,6 @@ public class Dictionary {
         }
         // short circuit if no special characters
         if (! input.contains("{")) return input+" ";
-        if (BuildConfig.DEBUG) Log.d("decode", "input:"+input+"   size: "+input.length());
         //handle glue
         String output = input+" ";
         if (output.contains("{&")) {
@@ -329,7 +315,6 @@ public class Dictionary {
             capitalizeNextWord = true;
             output = output.replace("{-|}","").replaceAll("\\s+$", ""); //trim space at end
         }
-        if (BuildConfig.DEBUG) Log.d("decode", "output:"+output+"   size: "+output.length());
         output = output.replace("{#Return}", "\n");
         output = output.replace("{#BackSpace}", "\b");
         pos = output.length()-2; //2nd character from end
@@ -337,7 +322,6 @@ public class Dictionary {
             output = output.replaceAll(" +$", "");
         }
         output = output.replace("{","").replace("}","");
-        if (BuildConfig.DEBUG) Log.d("decode", "output:"+output+"   size: "+output.length());
         return output;
     }
 
@@ -358,7 +342,7 @@ public class Dictionary {
         String result = "";
         String translation;
         Stack<String> historyItem;
-        Boolean replayOneMore = false;
+        Boolean replayOneMore;
         // if there are strokes in the queue, remove one
         if (! strokeQ.isEmpty()) {
             strokeQ.removeLast();
@@ -396,7 +380,6 @@ public class Dictionary {
             }
         }
         generateCandidates(strokesInQueue());
-        if (BuildConfig.DEBUG) Log.d("undoFromHistory", "history:..." + strokesInHistory());
         return result;
     }
 
@@ -466,12 +449,10 @@ public class Dictionary {
 
     private class loadDictionary extends AsyncTask<String, Integer, Long> {
         protected Long doInBackground(String... dictionaries) {
-            if (BuildConfig.DEBUG) Log.d("LoadDictionary", "Starting load...  Size:"+definitions.size());
             int count = dictionaries.length;
             String line, stroke, translation;
             String[] fields;
             for (int i = 0; i < count; i++) {
-                if (BuildConfig.DEBUG) Log.d("LoadDictionary", "Loading file:"+dictionaries[i]);
                 if (dictionaries[i] == null || dictionaries[i].isEmpty())
                     throw new IllegalArgumentException("Dictionary filename not provided");
                 try {
@@ -491,7 +472,6 @@ public class Dictionary {
                     reader.close();
                     filestream.close();
                 } catch (IOException e) {
-                    if (BuildConfig.DEBUG) Log.e("LoadDictionary", e.toString());
                     System.err.println("Dictionary File: "+dictionaries[i]+" could not be found");
                 }
                 publishProgress((int) ((i / (float) count) * 100));
@@ -504,7 +484,6 @@ public class Dictionary {
       protected void onPostExecute(Long result) {
           loaded = true;
           onDictionaryLoadedListener.onDictionaryLoaded();
-          if (BuildConfig.DEBUG) Log.d("LoadDictionary", "Load complete.  Size:"+definitions.size());
       }
     }
 }

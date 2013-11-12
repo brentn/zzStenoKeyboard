@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.inputmethodservice.InputMethodService;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.InputConnection;
@@ -52,7 +51,6 @@ public class StenoKeyboard extends InputMethodService {
             @Override
             public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
                 if (key.equals("pref_key_dictionary_count") || key.equals("pref_key_use_default_dictionary")) {
-                    if (BuildConfig.DEBUG) Log.d("StenoKeyboard", "Setting Changed");
                     loadDictionaries();
                 }
             }
@@ -73,7 +71,6 @@ public class StenoKeyboard extends InputMethodService {
                     String stroke = keyboardView.getStroke();
                     String message = dictionary.translate(stroke);
                     populateCandidates(dictionary.getCandidates());
-                    if (BuildConfig.DEBUG) Log.d("onCreateInputView", "sent stroke:"+stroke+"   translation:"+message);
                     sendText(message);
                 } else {
                     Toast.makeText(StenoKeyboard.this, "Dictionary not yet loaded", Toast.LENGTH_SHORT).show();
@@ -224,14 +221,12 @@ public class StenoKeyboard extends InputMethodService {
         // default dictionary?
         if (prefs.getBoolean("pref_key_use_default_dictionary", true)) {
             dict_name = Dictionary.getDictFile();
-            if (BuildConfig.DEBUG) Log.d("loadDictionaries", "loading: " + dict_name);
             dictionaries.add(dict_name);
         }
         // personal dictionaries
         int dict_count = prefs.getInt("pref_key_dictionary_count", 0);
         for (int i=0; i<dict_count; i++) {
             dict_name = prefs.getString("pref_key_personal_dictionary_"+(i+1), "");
-            if (BuildConfig.DEBUG) Log.d("loadDictionaries", "loading: " + dict_name);
             if (!dict_name.isEmpty()) {
                 dictionaries.add(dict_name);
             }
