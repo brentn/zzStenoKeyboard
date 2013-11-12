@@ -167,16 +167,27 @@ public class StenoKeyboard extends InputMethodService {
         if (connection == null) return; //short circuit
         // deals with backspaces
         if (message.contains("\b")) {
-            // deal with any backspaces at the start of the translation
-            int i = 0;
-            while (i < message.length() && message.charAt(i)=='\b')
-                i++;
-            if (i > 0) {
-                deleteWord(connection, i);
-                message = message.substring(i);
-            }
+            message = handleBackspaces(connection, message);
         }
         connection.commitText(message, 1);
+    }
+
+    private String handleBackspaces(InputConnection connection, String message) {
+        int i = 0;
+        while (i < message.length() && message.charAt(i)=='\b')
+            i++;
+        // delete the space at the end
+        if (i > 0) {
+            connection.deleteSurroundingText(1,0);
+            message = message.substring(1);
+            i--;
+        }
+        // if there are still backspaces, delete a whole word
+        if (i > 0) {
+            deleteWord(connection, i);
+            message = message.substring(i);
+        }
+        return message;
     }
 
     private void deleteWord(InputConnection connection, int size) {
